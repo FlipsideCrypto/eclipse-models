@@ -8,3 +8,8 @@ sources:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+  - name: github_actions
+    database: ECLIPSE
+    schema: github_actions
+    tables:
+      - name: workflows
