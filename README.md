@@ -1,13 +1,10 @@
-
-# Please find and replace all instances of `xyz` with your project name.
-
 ## Profile Set Up
 
 #### Use the following within profiles.yml 
 ----
 
 ```yml
-xyz:
+eclipse:
   target: dev
   outputs:
     dev:
@@ -17,7 +14,7 @@ xyz:
       user: <USERNAME>
       password: <PASSWORD>
       region: <REGION>
-      database: xyz_DEV
+      database: ECLIPSE_DEV
       warehouse: <WAREHOUSE>
       schema: silver
       threads: 4
@@ -73,5 +70,5 @@ dbt run --var '{"UPDATE_SNOWFLAKE_TAGS":True}' -s models/core/core__fact_swaps.s
 
 ```
 select *
-from table(xyz.information_schema.tag_references('xyz.core.fact_blocks', 'table'));
+from table(eclipse.information_schema.tag_references('eclipse.core.fact_blocks', 'table'));
 ```
