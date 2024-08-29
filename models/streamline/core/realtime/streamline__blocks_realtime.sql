@@ -17,7 +17,7 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 6572203
+        block_id >= 6572203 /* we currently only have access to the public node, this is the earliest block available there */
     EXCEPT
     SELECT
         block_id
