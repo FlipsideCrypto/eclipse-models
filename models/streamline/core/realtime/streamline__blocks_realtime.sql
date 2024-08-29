@@ -4,9 +4,9 @@
         func = 'streamline.udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"blocks",
-        "sql_limit" :"10000",
-        "producer_batch_size" :"10000",
-        "worker_batch_size" :"10000",
+        "sql_limit" :"200000",
+        "producer_batch_size" :"200000",
+        "worker_batch_size" :"20000",
         "sql_source" :"{{this.identifier}}" }
     )
 ) }}
@@ -16,15 +16,18 @@ WITH blocks AS (
         block_id
     FROM
         {{ ref("streamline__blocks") }}
+    WHERE
+        block_id >= 6572203
     EXCEPT
     SELECT
         block_id
     FROM
-        {{ ref('streamline__complete_blocks') }}
+        {{ ref('streamline__blocks_complete') }}
 )
 SELECT
+    block_id,
     ROUND(
-        block_number,
+        block_id,
         -5
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
