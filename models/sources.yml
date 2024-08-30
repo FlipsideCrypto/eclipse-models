@@ -1,6 +1,11 @@
 version: 2
 
 sources:
+  - name: bronze_streamline
+    database: streamline
+    schema: "{{ 'eclipse' if target.database == 'ECLIPSE' else 'eclipse_dev' }}"
+    tables:
+      - name: blocks
   - name: crosschain
     database: "{{ 'crosschain' if target.database == 'ECLIPSE' else 'crosschain_dev' }}"
     schema: core
@@ -8,6 +13,11 @@ sources:
       - name: dim_date_hours
       - name: address_tags
       - name: dim_dates
+  - name: crosschain_silver
+    database: "{{ 'crosschain' if target.database == 'SEI' else 'crosschain_dev' }}"
+    schema: silver
+    tables:
+      - name: number_sequence
   - name: github_actions
     database: ECLIPSE
     schema: github_actions
