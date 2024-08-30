@@ -4,6 +4,7 @@
 {{ config (
     materialized = "incremental",
     unique_key = 'block_id',
+    merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = "ROUND(block_id, -5)",
 ) }}
 
@@ -11,7 +12,10 @@ SELECT
     block_id,
     error,
     _partition_by_block_id,
-    _inserted_timestamp
+    _inserted_timestamp,
+    sysdate() AS inserted_timestamp,
+    sysdate() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id,
 FROM
 {% if is_incremental() %}
     {{ ref('bronze__blocks') }}
