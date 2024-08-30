@@ -1,5 +1,5 @@
--- depends_on: {{ ref('bronze__streamline_blocks') }}
--- depends_on: {{ ref('bronze__streamline_FR_blocks') }}
+-- depends_on: {{ ref('bronze__blocks') }}
+-- depends_on: {{ ref('bronze__FR_blocks') }}
 
 {{ config (
     materialized = "incremental",
@@ -14,7 +14,7 @@ SELECT
     _inserted_timestamp
 FROM
 {% if is_incremental() %}
-    {{ ref('bronze__streamline_blocks') }}
+    {{ ref('bronze__blocks') }}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -23,7 +23,7 @@ WHERE
             {{ this }}
     )
 {% else %}
-    {{ ref('bronze__streamline_FR_blocks') }}
+    {{ ref('bronze__FR_blocks') }}
 {% endif %}
 QUALIFY
     row_number() OVER (PARTITION BY block_id ORDER BY _inserted_timestamp DESC) = 1
