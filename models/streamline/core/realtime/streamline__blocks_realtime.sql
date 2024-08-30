@@ -7,7 +7,8 @@
         "sql_limit" :"200000",
         "producer_batch_size" :"200000",
         "worker_batch_size" :"20000",
-        "sql_source" :"{{this.identifier}}" }
+        "sql_source" :"{{this.identifier}}",
+        "order_by_column": "block_id" }
     )
 ) }}
 
@@ -17,7 +18,8 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 6572203 /* we currently only have access to the public node, this is the earliest block available there */
+        /* Find the earliest block available from the node provider */
+        block_id >= (SELECT min(block_id) FROM {{ ref('streamline__node_min_block_available') }}) 
     EXCEPT
     SELECT
         block_id
