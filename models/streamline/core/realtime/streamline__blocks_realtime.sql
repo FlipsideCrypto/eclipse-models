@@ -1,3 +1,4 @@
+  -- depends_on: {{ ref('streamline__node_min_block_available') }}
 {{ config (
     materialized = "view",
     post_hook = fsc_utils.if_data_call_function_v2(
@@ -12,6 +13,14 @@
     )
 ) }}
 
+{% if execute %}
+    {% set min_block_query %}
+    SELECT min(block_id) FROM {{ ref('streamline__node_min_block_available') }}
+    {% endset %}
+
+    {% set min_block_id = run_query(min_block_query)[0][0] %}
+{% endif %}
+
 WITH blocks AS (
     SELECT
         block_id
@@ -19,7 +28,7 @@ WITH blocks AS (
         {{ ref("streamline__blocks") }}
     WHERE
         /* Find the earliest block available from the node provider */
-        block_id >= (SELECT min(block_id) FROM {{ ref('streamline__node_min_block_available') }}) 
+        block_id >= {{ min_block_id }}
     EXCEPT
     SELECT
         block_id
