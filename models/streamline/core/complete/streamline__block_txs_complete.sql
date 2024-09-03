@@ -1,5 +1,5 @@
--- depends_on: {{ ref('bronze__blocks') }}
--- depends_on: {{ ref('bronze__FR_blocks') }}
+-- depends_on: {{ ref('bronze__transactions') }}
+-- depends_on: {{ ref('bronze__FR_transactions') }}
 
 {{ config (
     materialized = "incremental",
@@ -18,7 +18,7 @@ SELECT
     '{{ invocation_id }}' AS _invocation_id,
 FROM
 {% if is_incremental() %}
-    {{ ref('bronze__blocks') }}
+    {{ ref('bronze__transactions') }}
 WHERE
     _inserted_timestamp >= (
         SELECT
@@ -27,7 +27,7 @@ WHERE
             {{ this }}
     )
 {% else %}
-    {{ ref('bronze__FR_blocks') }}
+    {{ ref('bronze__FR_transactions') }}
 {% endif %}
 QUALIFY
     row_number() OVER (PARTITION BY block_id ORDER BY _inserted_timestamp DESC) = 1

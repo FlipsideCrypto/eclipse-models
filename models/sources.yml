@@ -6,6 +6,7 @@ sources:
     schema: "{{ 'eclipse' if target.database == 'ECLIPSE' else 'eclipse_dev' }}"
     tables:
       - name: blocks
+      - name: block_txs
   - name: crosschain
     database: "{{ 'crosschain' if target.database == 'ECLIPSE' else 'crosschain_dev' }}"
     schema: core
