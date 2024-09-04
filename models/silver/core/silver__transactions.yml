@@ -25,6 +25,10 @@ models:
               config:
                 where: >
                   block_timestamp::date > current_date - 30
+      - name: INDEX
+        description: "{{ doc('tx_index') }}"
+        tests:
+          - not_null: *recent_date_filter
       - name: FEE
         description: Transaction fee (in lamports)
         tests: 

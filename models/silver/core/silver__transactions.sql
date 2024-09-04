@@ -24,6 +24,7 @@ WITH pre_final AS (
         b.block_timestamp AS block_timestamp,
         t.block_id,
         t.tx_id,
+        t.index,
         t.data:transaction:message:recentBlockhash::string AS recent_block_hash,
         t.data:meta:fee::number AS fee,
         CASE
@@ -67,6 +68,7 @@ prev_null_block_timestamp_txs AS (
         b.block_timestamp,
         t.block_id,
         t.tx_id,
+        t.index,
         t.recent_block_hash,
         t.signers,
         t.fee,
@@ -128,6 +130,7 @@ SELECT
     block_timestamp,
     block_id,
     tx_id,
+    index,
     recent_block_hash,
     silver.udf_ordered_signers(account_keys) AS signers,
     fee,
