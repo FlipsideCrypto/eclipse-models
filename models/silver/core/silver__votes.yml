@@ -38,31 +38,31 @@ models:
         tests: 
           - not_null: *recent_date_filter
       - name: SIGNERS
-        description: List of accounts that signed the transaction
+        description: "{{ doc('signers') }}"
       - name: ACCOUNT_KEYS
-        description: List of accounts that are referenced by pre/post sol/token balances objects
+        description: "{{ doc('tx_account_keys') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: VOTE_INDEX
-        description: Index of the vote within a transaction
+        description: "{{ doc('vote_index') }}"
         tests:
           - not_null: *recent_date_filter
       - name: VOTE_ACCOUNT
-        description: Account belonging to the voting delegator
+        description: "{{ doc('vote_account') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: VOTE_AUTHORITY
-        description: Authority for the voting delegator
+        description: "{{ doc('vote_authority') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: VOTE_STATE_UPDATE
-        description: JSON data for the vote state upsdate
+        description: "{{ doc('vote_state_update') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: VERSION
-        description: Transaction version, legacy version is listed as NULL or 'legacy'
+        description: "{{ doc('tx_version') }}"
       - name: PARTITION_KEY
-        description: Partition used by the upstream bronze model
+        description: "{{ doc('partition_key') }}"
       - name: _INSERTED_TIMESTAMP
         description: "{{ doc('_inserted_timestamp') }}"
         data_tests: 
@@ -83,5 +83,5 @@ models:
         description: '{{ doc("_invocation_id") }}' 
         data_tests: 
           - not_null:
-              name: test_silver__not_null_votes__invocation_id
+              name: test_silver__not_null_votes_invocation_id
               <<: *recent_date_filter
