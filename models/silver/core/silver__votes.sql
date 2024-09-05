@@ -106,7 +106,7 @@ SELECT
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_id', 'vote_index']
-    ) }} AS transactions_id,
+    ) }} AS votes_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
@@ -120,7 +120,7 @@ SELECT
     *,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_id', 'vote_index']
-    ) }} AS transactions_id,
+    ) }} AS votes_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
