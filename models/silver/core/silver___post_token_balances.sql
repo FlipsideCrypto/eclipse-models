@@ -23,7 +23,7 @@ SELECT
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['block_id','tx_id','b.index']
-    ) }} AS _post_token_balance_id,
+    ) }} AS _post_token_balances_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
