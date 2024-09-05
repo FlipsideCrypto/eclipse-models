@@ -14,7 +14,7 @@ models:
         tests:
           - not_null: *recent_date_filter
       - name: RECENT_BLOCK_HASH
-        description: Previous block's hash value
+        description: "{{ doc('previous_block_hash') }}"
         tests:
           - not_null: *recent_date_filter
       - name: TX_ID
@@ -30,7 +30,7 @@ models:
         tests:
           - not_null: *recent_date_filter
       - name: FEE
-        description: Transaction fee (in lamports)
+        description: "{{ doc('tx_fee') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: SUCCEEDED
@@ -38,19 +38,19 @@ models:
         tests: 
           - not_null: *recent_date_filter
       - name: SIGNERS
-        description: List of accounts that signed the transaction
+        description: "{{ doc('signers') }}"
       - name: ACCOUNT_KEYS
-        description: List of accounts that are referenced by pre/post sol/token balances objects
+        description: "{{ doc('tx_account_keys') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: PRE_BALANCES
-        description: List of pre-transaction balances for different accounts
+        description: "{{ doc('pre_balances') }}"
       - name: POST_BALANCES
-        description: List of post-transaction balances for different accounts
+        description: "{{ doc('post_balances') }}"
       - name: PRE_TOKEN_BALANCES
-        description: List of pre-transaction token balances for different token accounts
+        description: "{{ doc('pre_token_balances') }}"
       - name: POST_TOKEN_BALANCES
-        description: List of post-transaction token balances for different token accounts
+        description: "{{ doc('post_token_balances') }}"
       - name: INSTRUCTIONS
         description: "{{ doc('instruction') }}"
         tests: 
@@ -60,19 +60,19 @@ models:
         tests: 
           - not_null: *recent_date_filter
       - name: LOG_MESSAGES
-        description: Array of log messages written by the program for this transaction
+        description: "{{ doc('log_messages') }}"
       - name: ADDRESS_TABLE_LOOKUPS
-        description: Array of lookup keys used associate additional account keys with the transactions.  Valid for version > 0 transactions.
+        description: "{{ doc('address_table_lookups') }}"
       - name: UNITS_CONSUMED
-        description: The number of compute units consumed by the program. 
+        description: "{{ doc('tx_units_consumed') }}"
       - name: UNIT_LIMIT
-        description: The max number of compute units that can be consumed by the program. 
+        description: "{{ doc('tx_unit_limit') }}"
       - name: TX_SIZE
-        description: The size of the transaction in bytes. 
+        description: "{{ doc('tx_size') }}"
       - name: VERSION
-        description: Transaction version, legacy version is listed as NULL or 'legacy'
+        description: "{{ doc('tx_version') }}"
       - name: PARTITION_KEY
-        description: Partition used by the upstream bronze model
+        description: "{{ doc('partition_key') }}"
       - name: _INSERTED_TIMESTAMP
         description: "{{ doc('_inserted_timestamp') }}"
         data_tests: 
