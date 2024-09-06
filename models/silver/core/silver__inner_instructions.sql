@@ -1,6 +1,6 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = ['block_id','tx_id','instruction_index','index'],
+    unique_key = ['block_id','tx_id','instruction_index','inner_index'],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE','program_id'],
     merge_exclude_columns = ["inserted_timestamp"],
@@ -25,7 +25,7 @@ WITH pre_final AS (
         block_id,
         tx_id,
         e.index AS instruction_index,
-        ii.index::integer AS index,
+        ii.index::integer AS inner_index,
         succeeded,
         signers,
         e.program_id AS instruction_program_id,
@@ -51,14 +51,14 @@ SELECT
     signers,
     succeeded,
     instruction_index,
-    index,
+    inner_index,
     instruction_program_id,
     program_id,
     event_type,
     instruction,
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
-        ['block_id', 'tx_id', 'instruction_index', 'index']
+        ['block_id', 'tx_id', 'instruction_index', 'inner_index']
     ) }} AS inner_instructions_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp,

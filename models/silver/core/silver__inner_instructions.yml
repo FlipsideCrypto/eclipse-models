@@ -9,7 +9,7 @@ models:
           combination_of_columns:
             - TX_ID
             - INSTRUCTION_INDEX
-            - INDEX
+            - INNER_INDEX
           where: block_timestamp::date > current_date - 30
     columns:
       - name: BLOCK_TIMESTAMP
@@ -38,7 +38,7 @@ models:
           - not_null: *recent_date_filter
       - name: INSTRUCTION_INDEX
         description: "{{ doc('event_index') }}"
-      - name: INDEX
+      - name: INNER_INDEX
         description: "{{ doc('inner_instruction_index') }}"
         tests:  
           - not_null: *recent_date_filter
