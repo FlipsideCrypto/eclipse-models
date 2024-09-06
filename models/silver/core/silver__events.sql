@@ -36,7 +36,7 @@ WITH base_transactions AS (
         _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
     WHERE
-        _inserted_timestamp::date = '2024-08-30'
+        _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
     {% endif %}
 ),
 base_instructions AS (
@@ -50,6 +50,7 @@ base_instructions AS (
         i.value:parsed:type::string AS event_type,
         i.value:programId::string AS program_id,
         i.value AS instruction,
+        _inserted_timestamp
     FROM
         base_transactions t,
         table(flatten(instructions)) i
@@ -72,8 +73,8 @@ SELECT
     i.signers,
     i.succeeded,
     i.index,
-    i.event_type AS event_type,
     i.program_id AS program_id,
+    i.event_type AS event_type,
     i.instruction,
     ii.inner_instruction,
     ii.inner_instruction_program_ids,

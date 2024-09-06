@@ -175,23 +175,23 @@ def get_tx_size(accts, instructions, version, addr_lookups, signers) -> int:
 $$;
 {% endmacro %}
 
-{% macro create_udf_get_all_inner_instruction_events(schema) %}
-create or replace function {{ schema }}.udf_get_all_inner_instruction_events(inner_instruction array)
+{% macro create_udf_get_all_inner_instruction_program_ids(schema) %}
+create or replace function {{ schema }}.udf_get_all_inner_instruction_program_ids(inner_instruction variant)
 returns array
 language python
 runtime_version = '3.8'
-handler = 'get_all_inner_instruction_events'
+handler = 'get_all_inner_instruction_program_ids'
 as
 $$
-def get_all_inner_instruction_events(inner_instruction) -> list:
-    event_types = [] 
+def get_all_inner_instruction_program_ids(inner_instruction) -> list:
+    program_ids = [] 
     if inner_instruction:
-        for v in inner_instruction:
-            if type(v) is dict and v.get("parsed") and type(v["parsed"]) is dict and v["parsed"].get("type"):
-                event_types.append(v["parsed"]["type"])
+        for v in inner_instruction.get('instructions',[]):
+            if type(v) is dict and v.get("programId"):
+                program_ids.append(v.get("programId"))
             else:
-                event_types.append(None)
+                program_ids.append(None)
 
-    return event_types
+    return program_ids
 $$;
 {% endmacro %}
