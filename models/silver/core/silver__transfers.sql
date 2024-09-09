@@ -182,7 +182,7 @@ native_transfers AS (
         e.succeeded,
         instruction:parsed:info:source::string AS tx_from,
         instruction:parsed:info:destination::string AS tx_to,
-        9 AS decimal,
+        9 AS decimal, -- Default decimal adjustment for Lamports
         instruction:parsed:info:lamports AS amount,
         CASE
             WHEN e.program_id = '11111111111111111111111111111111' THEN '{{ native_token_address }}' 
