@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__inner_instructions
+  - name: silver__events_inner
     recent_date_filter: &recent_date_filter
       config:
         where: _inserted_timestamp >= current_date - 7
