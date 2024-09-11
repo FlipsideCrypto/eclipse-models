@@ -7,7 +7,7 @@
 ) %}
 WITH meta AS (
     SELECT
-        LAST_MODIFIED AS _inserted_timestamp,
+        LAST_MODIFIED::timestamp_ntz AS _inserted_timestamp,
         file_name,
         {{ partition_function }} AS {{ partition_name }}
     FROM
@@ -52,7 +52,7 @@ WHERE
 ) %}
 WITH meta AS (
     SELECT
-        LAST_MODIFIED AS _inserted_timestamp,
+        LAST_MODIFIED::timestamp_ntz AS _inserted_timestamp,
         file_name,
         {{ partition_function }} AS {{ partition_name }}
     FROM
