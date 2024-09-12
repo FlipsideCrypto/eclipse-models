@@ -62,7 +62,7 @@ WITH base_transfers_i AS (
         instruction,
         _inserted_timestamp
     FROM
-        {{ ref('silver__inner_instructions') }}
+        {{ ref('silver__events_inner') }}
     WHERE
         event_type IN (
             'transfer',

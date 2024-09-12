@@ -1,6 +1,6 @@
 version: 2
 models:
-  - name: silver__inner_instructions
+  - name: silver__events_inner
     recent_date_filter: &recent_date_filter
       config:
         where: _inserted_timestamp >= current_date - 7
@@ -56,7 +56,7 @@ models:
         description: "{{ doc('_inserted_timestamp') }}"
         tests: 
           - not_null
-      - name: INNER_INSTRUCTIONS_ID
+      - name: EVENTS_INNER_ID
         description: '{{ doc("pk") }}'
         data_tests: 
           - not_null: *recent_date_filter

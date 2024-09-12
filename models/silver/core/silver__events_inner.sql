@@ -59,7 +59,7 @@ SELECT
     _inserted_timestamp,
     {{ dbt_utils.generate_surrogate_key(
         ['block_id', 'tx_id', 'instruction_index', 'inner_index']
-    ) }} AS inner_instructions_id,
+    ) }} AS events_inner_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
