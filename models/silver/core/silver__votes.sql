@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('bronze__transactions') }}
+
 {{ config(
     materialized = 'incremental',
     unique_key = ['tx_id','vote_index'],
