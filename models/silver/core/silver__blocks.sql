@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('bronze__blocks') }}
+
 {{ config(
   materialized = 'incremental',
   unique_key = "block_id",
@@ -33,7 +35,11 @@ WITH pre_final AS (
         data:result:previousBlockhash::string AS previous_block_hash,
         _inserted_timestamp
     FROM
+        {% if is_incremental() %}
         {{ ref('bronze__blocks') }}
+        {% else %}
+        {{ ref('bronze__FR_blocks') }}
+        {% endif %}
     WHERE
         block_id IS NOT NULL
         AND error IS NULL
