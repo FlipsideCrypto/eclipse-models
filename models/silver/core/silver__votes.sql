@@ -35,14 +35,17 @@ WITH pre_final AS (
         END AS succeeded,
         t.data:transaction:message:accountKeys::array AS account_keys,
         i.index::int AS vote_index,
-        i.value:parsed:info:voteAccount::string AS vote_account,
-        i.value:parsed:info:voteAuthority::string AS vote_authority,
-        i.value:parsed:info:voteStateUpdate::variant AS vote_state_update,
+        i.value:parsed:type::string AS event_type,
+        i.value::variant AS instruction,
         t.data:version::string as version,
         t.partition_key,
         t._inserted_timestamp
     FROM
+        {% if is_incremental() %}
         {{ ref('bronze__transactions') }} t
+        {% else %}
+        {{ ref('bronze__FR_transactions') }} t
+        {% endif %}
     LEFT OUTER JOIN 
         {{ ref('silver__blocks') }} b
         ON b.block_id = t.block_id
@@ -72,9 +75,8 @@ prev_null_block_timestamp_txs AS (
         t.succeeded,
         t.account_keys,
         t.vote_index,
-        t.vote_account,
-        t.vote_authority,
-        t.vote_state_update,
+        t.event_type,
+        t.instruction,
         t.version,
         t.partition_key,
         greatest(t._inserted_timestamp,b._inserted_timestamp) as _inserted_timestamp
@@ -98,9 +100,8 @@ SELECT
     succeeded,
     account_keys,
     vote_index,
-    vote_account,
-    vote_authority,
-    vote_state_update,
+    event_type,
+    instruction,
     version,
     partition_key,
     _inserted_timestamp,
