@@ -41,4 +41,4 @@ jobs:
           dbt deps
       - name: Run DBT Jobs
         run: |
-          dbt run -s streamline__blocks_complete streamline__blocks_realtime --vars '{STREAMLINE_INVOKE_STREAM: True}'
+          dbt run -s streamline__blocks_complete streamline__blocks_realtime --vars '{STREAMLINE_INVOKE_STREAMS: True}'
