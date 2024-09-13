@@ -47,16 +47,12 @@ models:
         description: "{{ doc('vote_index') }}"
         tests:
           - not_null: *recent_date_filter
-      - name: VOTE_ACCOUNT
-        description: "{{ doc('vote_account') }}"
+      - name: EVENT_TYPE
+        description: "{{ doc('vote_event_type') }}"
         tests: 
           - not_null: *recent_date_filter
-      - name: VOTE_AUTHORITY
-        description: "{{ doc('vote_authority') }}"
-        tests: 
-          - not_null: *recent_date_filter
-      - name: VOTE_STATE_UPDATE
-        description: "{{ doc('vote_state_update') }}"
+      - name: INSTRUCTION
+        description: "{{ doc('vote_instruction') }}"
         tests: 
           - not_null: *recent_date_filter
       - name: VERSION
