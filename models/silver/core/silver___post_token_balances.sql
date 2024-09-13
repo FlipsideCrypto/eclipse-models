@@ -40,5 +40,5 @@ WHERE
     )
 {% else %}
 WHERE
-    _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+    _inserted_timestamp::date = '2024-09-12'
 {% endif %}

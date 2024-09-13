@@ -65,7 +65,7 @@ WITH pre_final AS (
         {% if is_incremental() %}
         AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
         {% else %}
-        AND t._inserted_timestamp >= '2024-08-01' /* TODO replace with whenever we start getting data in PROD */
+        AND t._inserted_timestamp::date = '2024-09-12'
         {% endif %}
 ),
 {% if is_incremental() %}

@@ -36,7 +36,7 @@ WITH base_transactions AS (
         _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
     WHERE
-        _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+        _inserted_timestamp::date = '2024-09-12'
     {% endif %}
 ),
 base_instructions AS (

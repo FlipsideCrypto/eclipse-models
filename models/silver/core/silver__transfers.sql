@@ -47,7 +47,7 @@ WITH base_transfers_i AS (
     {% if is_incremental() %}
         AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        AND _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+        AND _inserted_timestamp::date = '2024-09-12'
     {% endif %}
     UNION ALL
     SELECT
@@ -73,7 +73,7 @@ WITH base_transfers_i AS (
     {% if is_incremental() %}
         AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        AND _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+        AND _inserted_timestamp::date = '2024-09-12'
     {% endif %}
 ),
 base_post_token_balances AS (
@@ -89,7 +89,7 @@ base_post_token_balances AS (
     {% if is_incremental() %}
         _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+        _inserted_timestamp::date = '2024-09-12'
     {% endif %}
 ),
 base_pre_token_balances AS (
@@ -105,7 +105,7 @@ base_pre_token_balances AS (
     {% if is_incremental() %}
         _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        _inserted_timestamp::date = '2024-08-30' /* TODO replace with whenever we start getting data in PROD */
+        _inserted_timestamp::date = '2024-09-12'
     {% endif %}
 ),
 spl_transfers AS (
