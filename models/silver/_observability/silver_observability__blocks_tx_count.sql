@@ -5,6 +5,7 @@
     tags = ['observability']
 ) }}
 
+/* CURRENTLY UNUSED UNTIL WE HAVE A WAY TO VERIFY TX COUNTS PER BLOCK */
 WITH base as (
     SELECT 
         block_id,
