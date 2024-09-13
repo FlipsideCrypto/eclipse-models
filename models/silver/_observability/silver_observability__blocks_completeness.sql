@@ -42,7 +42,7 @@ AND (
         )
         OR (
             {% if var('OBSERV_FULL_TEST') %}
-            block_id >= 6572203 --current min block available
+            block_id >= 6572203 --TODO current min block available
             {% else %}
             block_id >= (
                 SELECT

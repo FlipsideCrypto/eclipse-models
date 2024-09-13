@@ -17,7 +17,7 @@ WITH base as (
         _inserted_timestamp > (SELECT max(_inserted_timestamp) FROM {{ this }})
     {% else %}
     WHERE 
-        block_id >= 6572203
+        block_id >= 6572203 --TODO current min block available
     {% endif %}
     UNION ALL 
     SELECT 
@@ -31,7 +31,7 @@ WITH base as (
         _inserted_timestamp > (SELECT max(_inserted_timestamp) FROM {{ this }})
     {% else %}
     WHERE 
-        block_id >= 6572203
+        block_id >= 6572203 --TODO current min block available
     {% endif %}
 )
 SELECT 
