@@ -1,3 +1,5 @@
+-- depends_on: {{ ref('bronze__transactions') }}
+
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_id",
@@ -46,10 +48,14 @@ WITH pre_final AS (
         t.partition_key,
         t._inserted_timestamp
     FROM
+        {% if is_incremental() %}
         {{ ref('bronze__transactions') }} t
-        LEFT OUTER JOIN 
-            {{ ref('silver__blocks') }} b
-            ON b.block_id = t.block_id
+        {% else %}
+        {{ ref('bronze__FR_transactions') }} t
+        {% endif %}
+    LEFT OUTER JOIN 
+        {{ ref('silver__blocks') }} b
+        ON b.block_id = t.block_id
     WHERE
         tx_id IS NOT NULL
         AND (
