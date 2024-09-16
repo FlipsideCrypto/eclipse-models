@@ -3,7 +3,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['tx_id','vote_index'],
-    incremental_predicates = ['DBT_INTERNAL_DEST.block_timestamp >= (select min(block_timestamp) from ' ~ generate_tmp_view_name(this) ~ ') OR DBT_INTERNAL_DEST.block_timestamp IS NULL'],
+    incremental_predicates = ["coalesce(DBT_INTERNAL_DEST.block_timestamp,'2999-12-31') >= (select min(block_timestamp) from " ~ generate_tmp_view_name(this) ~ ")"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['scheduled_core']
