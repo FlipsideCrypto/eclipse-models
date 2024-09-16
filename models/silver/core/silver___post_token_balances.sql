@@ -30,15 +30,15 @@ SELECT
 FROM
     {{ ref('silver__transactions') }} t,
     table(flatten(post_token_balances)) b
-{% if is_incremental() %}
 WHERE
-    _inserted_timestamp >= (
+    block_timestamp IS NOT NULL
+{% if is_incremental() %}
+    AND _inserted_timestamp >= (
         SELECT
             MAX(_inserted_timestamp)
         FROM
             {{ this }}
     )
 {% else %}
-WHERE
-    _inserted_timestamp::date = '2024-09-12'
+    AND _inserted_timestamp::date = '2024-09-12'
 {% endif %}
