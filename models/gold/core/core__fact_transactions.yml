@@ -1,0 +1,122 @@
+version: 2
+models:
+  - name: core__fact_transactions
+    description: A table that contains high level information about every transaction on the Eclipse blockchain. 
+    recent_date_filter: &recent_date_filter
+      config:
+        where: modified_timestamp >= current_date - 7
+    columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null:
+              config:
+                where: >
+                  modified_timestamp >= current_date - 7
+                  AND block_timestamp::date < current_timestamp - INTERVAL '2 HOUR'
+      - name: BLOCK_ID
+        description: "{{ doc('block_id') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: RECENT_BLOCK_HASH
+        description: "{{ doc('previous_block_hash') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+          - unique
+      - name: INDEX
+        description: "{{ doc('tx_index') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: FEE
+        description: "{{ doc('tx_fee') }}"
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: SUCCEEDED
+        description: "{{ doc('tx_succeeded') }}"
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: SIGNERS
+        description: "{{ doc('signers') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: ACCOUNT_KEYS
+        description: "{{ doc('tx_account_keys') }}"
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: PRE_BALANCES
+        description: "{{ doc('pre_balances') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: POST_BALANCES
+        description: "{{ doc('post_balances') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: PRE_TOKEN_BALANCES
+        description: "{{ doc('pre_token_balances') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: POST_TOKEN_BALANCES
+        description: "{{ doc('post_token_balances') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: INSTRUCTIONS
+        description: "{{ doc('instruction') }}"
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: INNER_INSTRUCTIONS
+        description: "{{ doc('inner_instruction') }}"
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: LOG_MESSAGES
+        description: "{{ doc('log_messages') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: ADDRESS_TABLE_LOOKUPS
+        description: "{{ doc('address_table_lookups') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: UNITS_CONSUMED
+        description: "{{ doc('tx_units_consumed') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: UNITS_LIMIT
+        description: "{{ doc('tx_unit_limit') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: TX_SIZE
+        description: "{{ doc('tx_size') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: VERSION
+        description: "{{ doc('tx_version') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: FACT_TRANSACTIONS_ID
+        description: '{{ doc("pk") }}'
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
+        data_tests: 
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
