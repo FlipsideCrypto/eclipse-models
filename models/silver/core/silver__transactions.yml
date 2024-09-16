@@ -8,7 +8,11 @@ models:
       - name: BLOCK_TIMESTAMP
         description: "{{ doc('block_timestamp') }}"
         tests:
-          - not_null: *recent_date_filter
+          - not_null:
+              config:
+                where: >
+                  _inserted_timestamp >= current_date - 7
+                  AND block_timestamp < current_timestamp - INTERVAL '2 HOUR'
       - name: BLOCK_ID
         description: "{{ doc('block_id') }}"
         tests:

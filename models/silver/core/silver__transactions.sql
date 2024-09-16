@@ -3,7 +3,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_id",
-    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
+    incremental_predicates = ['DBT_INTERNAL_DEST.block_timestamp >= (select min(block_timestamp) from ' ~ generate_tmp_view_name(this) ~ ') OR DBT_INTERNAL_DEST.block_timestamp IS NULL'],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['scheduled_core']
@@ -131,6 +131,56 @@ qualifying_transactions AS (
         pre_final
     WHERE
         array_size(instructions) = 0
+),
+combined AS (
+    SELECT
+        block_timestamp,
+        block_id,
+        tx_id,
+        index,
+        recent_block_hash,
+        silver.udf_ordered_signers(account_keys) AS signers,
+        fee,
+        succeeded,
+        account_keys,
+        pre_balances,
+        post_balances,
+        pre_token_balances,
+        post_token_balances,
+        instructions,
+        inner_instructions,
+        log_messages,
+        address_table_lookups,
+        silver.udf_get_compute_units_consumed(log_messages, instructions) as units_consumed,
+        silver.udf_get_compute_units_total(log_messages, instructions) as units_limit,
+        silver.udf_get_tx_size(account_keys,instructions,version,address_table_lookups,signers) as tx_size,
+        version,
+        partition_key,
+        _inserted_timestamp,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_id']
+        ) }} AS transactions_id,
+        sysdate() AS inserted_timestamp,
+        sysdate() AS modified_timestamp,
+        '{{ invocation_id }}' AS _invocation_id
+    FROM
+        pre_final b 
+    JOIN
+        qualifying_transactions
+        USING(tx_id)
+    {% if is_incremental() %}
+    UNION
+    SELECT
+        *,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_id']
+        ) }} AS transactions_id,
+        sysdate() AS inserted_timestamp,
+        sysdate() AS modified_timestamp,
+        '{{ invocation_id }}' AS _invocation_id
+    FROM
+        prev_null_block_timestamp_txs
+    {% endif %}
 )
 SELECT
     block_timestamp,
@@ -138,7 +188,7 @@ SELECT
     tx_id,
     index,
     recent_block_hash,
-    silver.udf_ordered_signers(account_keys) AS signers,
+    signers,
     fee,
     succeeded,
     account_keys,
@@ -150,35 +200,17 @@ SELECT
     inner_instructions,
     log_messages,
     address_table_lookups,
-    silver.udf_get_compute_units_consumed(log_messages, instructions) as units_consumed,
-    silver.udf_get_compute_units_total(log_messages, instructions) as units_limit,
-    silver.udf_get_tx_size(account_keys,instructions,version,address_table_lookups,signers) as tx_size,
+    units_consumed,
+    units_limit,
+    tx_size,
     version,
     partition_key,
     _inserted_timestamp,
-    {{ dbt_utils.generate_surrogate_key(
-        ['tx_id']
-    ) }} AS transactions_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
+    transactions_id,
+    inserted_timestamp,
+    modified_timestamp,
+    _invocation_id
 FROM
-    pre_final b 
-JOIN
-    qualifying_transactions
-    USING(tx_id)
+    combined
 QUALIFY
     row_number() OVER (PARTITION BY block_id, tx_id ORDER BY _inserted_timestamp DESC) = 1
-{% if is_incremental() %}
-UNION
-SELECT
-    *,
-    {{ dbt_utils.generate_surrogate_key(
-        ['tx_id']
-    ) }} AS transactions_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
-FROM
-    prev_null_block_timestamp_txs
-{% endif %}
