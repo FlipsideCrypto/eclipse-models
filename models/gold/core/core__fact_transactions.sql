@@ -1,5 +1,3 @@
--- depends_on: {{ ref('bronze__blocks') }}
-
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_id",
@@ -47,7 +45,8 @@ SELECT
     modified_timestamp
 FROM
     {{ ref('silver__transactions') }}
-{% if is_incremental() %}
 WHERE
-    modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
+    block_timestamp IS NOT NULL
+{% if is_incremental() %}
+    AND modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
 {% endif %}
