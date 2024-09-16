@@ -3,7 +3,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ['tx_id','vote_index'],
-    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
+    incremental_predicates = ["coalesce(DBT_INTERNAL_DEST.block_timestamp,'2999-12-31') >= (select min(block_timestamp) from " ~ generate_tmp_view_name(this) ~ ")"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['scheduled_core']
@@ -89,15 +89,54 @@ prev_null_block_timestamp_txs AS (
         ON b.block_id = t.block_id
     WHERE
         t.block_timestamp::DATE IS NULL
-)
+),
 {% endif %}
+combined AS (
+    SELECT
+        block_timestamp,
+        block_id,
+        tx_id,
+        index,
+        recent_block_hash,
+        silver.udf_ordered_signers(account_keys) AS signers,
+        fee,
+        succeeded,
+        account_keys,
+        vote_index,
+        event_type,
+        instruction,
+        version,
+        partition_key,
+        _inserted_timestamp,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_id', 'vote_index']
+        ) }} AS votes_id,
+        sysdate() AS inserted_timestamp,
+        sysdate() AS modified_timestamp,
+        '{{ invocation_id }}' AS _invocation_id
+    FROM
+        pre_final b 
+    {% if is_incremental() %}
+    UNION
+    SELECT
+        *,
+        {{ dbt_utils.generate_surrogate_key(
+            ['tx_id', 'vote_index']
+        ) }} AS votes_id,
+        sysdate() AS inserted_timestamp,
+        sysdate() AS modified_timestamp,
+        '{{ invocation_id }}' AS _invocation_id
+    FROM
+        prev_null_block_timestamp_txs
+    {% endif %}
+)
 SELECT
     block_timestamp,
     block_id,
     tx_id,
     index,
     recent_block_hash,
-    silver.udf_ordered_signers(account_keys) AS signers,
+    signers,
     fee,
     succeeded,
     account_keys,
@@ -107,26 +146,11 @@ SELECT
     version,
     partition_key,
     _inserted_timestamp,
-    {{ dbt_utils.generate_surrogate_key(
-        ['tx_id', 'vote_index']
-    ) }} AS votes_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
+    votes_id,
+    inserted_timestamp,
+    modified_timestamp,
+    _invocation_id
 FROM
-    pre_final b 
+    combined
 QUALIFY
     row_number() OVER (PARTITION BY block_id, tx_id ORDER BY _inserted_timestamp DESC) = 1
-{% if is_incremental() %}
-UNION
-SELECT
-    *,
-    {{ dbt_utils.generate_surrogate_key(
-        ['tx_id', 'vote_index']
-    ) }} AS votes_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
-    '{{ invocation_id }}' AS _invocation_id
-FROM
-    prev_null_block_timestamp_txs
-{% endif %}
