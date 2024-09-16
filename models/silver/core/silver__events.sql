@@ -31,12 +31,12 @@ WITH base_transactions AS (
         _inserted_timestamp
     FROM
         {{ ref('silver__transactions') }} 
+    WHERE
+        block_timestamp IS NOT NULL
     {% if is_incremental() %}
-    WHERE
-        _inserted_timestamp >= '{{ max_inserted_timestamp }}'
+        AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-    WHERE
-        _inserted_timestamp::date = '2024-09-12'
+        AND _inserted_timestamp::date = '2024-09-12'
     {% endif %}
 ),
 base_instructions AS (

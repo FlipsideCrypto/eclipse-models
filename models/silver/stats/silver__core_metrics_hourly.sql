@@ -30,7 +30,8 @@
         FROM
             {{ ref('silver__transactions') }}
         WHERE
-            _inserted_timestamp >= '{{ max_inserted_timestamp }}'
+            block_timestamp IS NOT NULL
+            AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
         {% endset %}
         {% set block_dates = run_query(query).columns [0].values() [0] %}
     {% endif %}
@@ -74,7 +75,8 @@ tx_stats_base AS (
     FROM
         {{ ref('silver__transactions') }}
     WHERE
-        block_timestamp_hour < DATE_TRUNC(
+        block_timestamp IS NOT NULL
+        AND block_timestamp_hour < DATE_TRUNC(
             'hour',
             CURRENT_TIMESTAMP
         )
@@ -94,7 +96,8 @@ tx_stats_base AS (
     FROM
         {{ ref('silver__votes') }}
     WHERE
-        block_timestamp_hour < DATE_TRUNC(
+        block_timestamp IS NOT NULL
+        AND block_timestamp_hour < DATE_TRUNC(
             'hour',
             CURRENT_TIMESTAMP
         )
