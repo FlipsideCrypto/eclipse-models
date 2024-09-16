@@ -38,7 +38,8 @@ SELECT
     modified_timestamp
 FROM
     {{ ref('silver__votes') }}
-{% if is_incremental() %}
 WHERE
-    modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
+    block_timestamp IS NOT NULL
+{% if is_incremental() %}
+    AND modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
 {% endif %}
