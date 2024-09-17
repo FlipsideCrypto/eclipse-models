@@ -4,6 +4,7 @@
   materialized = 'incremental',
   unique_key = "block_id",
   incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
+  merge_exclude_columns = ["inserted_timestamp"],
   cluster_by = ['block_timestamp::DATE'],
   full_refresh = false,
   tags = ['scheduled_core'],
@@ -31,8 +32,8 @@ SELECT
     previous_block_id,
     previous_block_hash,
     blocks_id AS fact_blocks_id,
-    inserted_timestamp,
-    modified_timestamp,
+    sysdate() AS inserted_timestamp,
+    sysdate() AS modified_timestamp
 FROM
     {{ ref('silver__blocks') }}
 {% if is_incremental() %}

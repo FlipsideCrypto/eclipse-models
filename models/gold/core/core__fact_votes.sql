@@ -2,6 +2,7 @@
     materialized = 'incremental',
     unique_key = ['tx_id','vote_index'],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
+    merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = ['block_timestamp::DATE'],
     post_hook = enable_search_optimization('{{this.schema}}','{{this.identifier}}','ON EQUALITY(tx_id)'),
     tags = ['scheduled_core']
@@ -35,8 +36,8 @@ SELECT
     instruction,
     version,
     votes_id AS fact_votes_id,
-    inserted_timestamp,
-    modified_timestamp
+    sysdate() AS inserted_timestamp,
+    sysdate() AS modified_timestamp
 FROM
     {{ ref('silver__votes') }}
 WHERE
