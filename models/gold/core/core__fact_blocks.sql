@@ -1,5 +1,3 @@
--- depends_on: {{ ref('bronze__blocks') }}
-
 {{ config(
   materialized = 'incremental',
   unique_key = "block_id",
