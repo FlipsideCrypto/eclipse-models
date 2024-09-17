@@ -37,5 +37,5 @@ FROM
     {{ ref('silver__events') }}
 {% if is_incremental() %}
 WHERE
-    modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
+    modified_timestamp > '{{ max_modified_timestamp }}'
 {% endif %}

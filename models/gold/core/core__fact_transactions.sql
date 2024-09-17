@@ -48,5 +48,5 @@ FROM
 WHERE
     block_timestamp IS NOT NULL
 {% if is_incremental() %}
-    AND modified_timestamp > (SELECT max(modified_timestamp) FROM {{ this }})
+    AND modified_timestamp > '{{ max_modified_timestamp }}'
 {% endif %}
