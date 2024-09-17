@@ -3,6 +3,7 @@
     unique_key = ['block_id','tx_id','instruction_index','inner_index'],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     cluster_by = ['block_timestamp::DATE','program_id'],
+    post_hook = enable_search_optimization('{{this.schema}}','{{this.identifier}}','ON EQUALITY(tx_id, program_id, event_type, instruction_program_id)'),
     tags = ['scheduled_core']
 ) }}
 

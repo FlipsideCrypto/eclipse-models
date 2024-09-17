@@ -3,6 +3,7 @@
     unique_key = ['tx_id','vote_index'],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     cluster_by = ['block_timestamp::DATE'],
+    post_hook = enable_search_optimization('{{this.schema}}','{{this.identifier}}','ON EQUALITY(tx_id)'),
     tags = ['scheduled_core']
 ) }}
 

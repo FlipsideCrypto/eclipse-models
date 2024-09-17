@@ -3,6 +3,7 @@
     unique_key = ["fact_transfers_id"],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     cluster_by = ['block_timestamp::DATE'],
+    post_hook = enable_search_optimization('{{this.schema}}','{{this.identifier}}','ON EQUALITY(tx_id, program_id, tx_from, tx_to, mint, fact_transfers_id)'),
     tags = ['scheduled_core']
 ) }}
 
