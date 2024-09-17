@@ -86,6 +86,4 @@ models:
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("modified_timestamp") }}' 
         data_tests: 
-          - not_null: *recent_date_filter
-      - name: _INVOCATION_ID
-        description: '{{ doc("_invocation_id") }}' 
+          - not_null
