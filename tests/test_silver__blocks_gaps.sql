@@ -42,3 +42,5 @@ SELECT
     gap_end_block_id - gap_start_block_id AS diff
 FROM
     gaps
+WHERE
+    gap_end_block_id <> 6572202 /* we know that blocks 0 to 6572202 is currently unavailable */
