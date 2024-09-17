@@ -1,6 +1,7 @@
 version: 2
 models:
   - name: core__fact_events_inner
+    description: Contains each inner event that occurs on Eclipse. An event can consist of more than one inner event. 
     recent_date_filter: &recent_date_filter
       config:
         where: modified_timestamp >= current_date - 7

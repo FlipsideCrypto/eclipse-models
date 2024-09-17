@@ -1,6 +1,7 @@
 version: 2
 models:
   - name: core__fact_votes
+    description: A table that contains high level information about native vote program events on the Eclipse blockchain. 
     recent_date_filter: &recent_date_filter
       config:
         where: modified_timestamp >= current_date - 7

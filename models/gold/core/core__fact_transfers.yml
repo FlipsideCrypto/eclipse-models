@@ -1,6 +1,7 @@
 version: 2
 models:
   - name: core__fact_transfers
+    description: Contains transfer events for Eclipse and spl-tokens. 
     recent_date_filter: &recent_date_filter
       config:
         where: modified_timestamp >= current_date - 7
