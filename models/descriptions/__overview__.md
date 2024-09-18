@@ -17,17 +17,18 @@ There is more information on how to use dbt docs in the last section of this doc
 
 **Click on the links below to jump to the documentation for each schema.**
 
-### Core Tables (`ECLIPSE`.`CORE`.`<table_name>`)
+ 
 
-**Dimension Tables:**
+### Core Fact Tables (`Eclipse`.`CORE`.`<table_name>`)
+- [fact_blocks](#!/model/model.eclipse_models.core__fact_blocks)
+- [fact_events](#!/model/model.eclipse_models.core__fact_events)
+- [fact_events_inner](#!/model/model.eclipse_models.core__fact_events_inner)
+- [fact_transactions](#!/model/model.eclipse_models.core__fact_transactions)
+- [fact_transfers](#!/model/model.eclipse_models.core__fact_transfers)
 
 
-**Fact Tables:**
-
-
-
-**Convenience Tables:**
-
+### Governance Tables (`Eclipse`.`GOV`.`<table_name>`)
+- [fact_votes](#!/model/model.eclipse_models.core__fact_votes)
 
 
 
