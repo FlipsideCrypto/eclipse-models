@@ -62,9 +62,8 @@ WITH pre_final AS (
         {% else %}
         AND t._inserted_timestamp::date = '2024-09-12'
         {% endif %}
-)
+),
 {% if is_incremental() %}
-,
 prev_null_block_timestamp_txs AS (
     SELECT
         b.block_timestamp,
