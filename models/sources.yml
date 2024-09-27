@@ -15,7 +15,7 @@ sources:
       - name: address_tags
       - name: dim_dates
   - name: crosschain_silver
-    database: "{{ 'crosschain' if target.database == 'SEI' else 'crosschain_dev' }}"
+    database: "{{ 'crosschain' if target.database == 'ECLIPSE' else 'crosschain_dev' }}"
     schema: silver
     tables:
       - name: number_sequence
