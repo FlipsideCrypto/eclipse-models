@@ -3,7 +3,9 @@ models:
   - name: silver__blocks
     recent_date_filter: &recent_date_filter
       config:
-        where: _inserted_timestamp >= current_date - 7
+        where: > 
+          _inserted_timestamp >= current_date - 7
+          AND block_id > 0
     columns:
       - name: BLOCK_ID
         description: "{{ doc('block_id') }}"
