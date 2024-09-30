@@ -4,9 +4,7 @@ models:
     description: Contains general information about each block produced on Eclipse. 
     recent_date_filter: &recent_date_filter
       config:
-        where: >
-          modified_timestamp >= current_date - 7
-          AND block_id > 0
+        where: modified_timestamp >= current_date - 7
     columns:
       - name: BLOCK_ID
         description: "{{ doc('block_id') }}"
