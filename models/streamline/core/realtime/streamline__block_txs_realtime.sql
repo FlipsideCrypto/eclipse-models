@@ -29,7 +29,7 @@ WITH blocks AS (
         {{ ref("streamline__blocks") }}
     WHERE
         /* Find the earliest block available from the node provider */
-        block_id >= {{ min_block_id }}
+        block_id >= 6572203
     EXCEPT
     SELECT
         block_id
