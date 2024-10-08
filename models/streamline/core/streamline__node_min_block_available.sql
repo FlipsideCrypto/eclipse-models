@@ -9,7 +9,7 @@ WITH node_response AS (
     SELECT
         {{ target.database }}.live.udf_api(
             'POST',
-            'https://mainnetbeta-rpc.eclipse.xyz',
+            'https://eclipse.lgns.net:443',
             OBJECT_CONSTRUCT(
                 'Content-Type',
                 'application/json'
