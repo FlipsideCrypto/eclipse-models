@@ -9,7 +9,7 @@
         "producer_batch_size" :"200000",
         "worker_batch_size" :"20000",
         "sql_source" :"{{this.identifier}}",
-        "order_by_column": "block_id" }
+        "order_by_column": "block_id DESC" }
     )
 ) }}
 
@@ -28,8 +28,7 @@ WITH blocks AS (
         {{ ref("streamline__blocks") }}
     WHERE
         /* Find the earliest block available from the node provider */
-        -- block_id >= {{ min_block_id }}
-        block_id >= 6572203
+        block_id >= {{ min_block_id }}
     EXCEPT
     SELECT
         block_id
@@ -74,5 +73,3 @@ SELECT
     ) AS request
 FROM
     blocks
-ORDER BY
-    block_id
