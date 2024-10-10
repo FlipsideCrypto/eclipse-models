@@ -1,0 +1,98 @@
+version: 2
+models:
+  - name: defi__fact_token_mint_actions
+    description: Contains all mint events for tokens
+    recent_date_filter: &recent_date_filter
+      config:
+        where: modified_timestamp >= current_date - 7
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - TX_ID
+            - MINT
+            - INDEX
+            - INNER_INDEX
+          where: block_timestamp::date > current_date - 30
+    columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 2
+      - name: BLOCK_ID
+        description: "{{ doc('block_id') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: INDEX
+        description: "{{ doc('event_index') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: INNER_INDEX
+        description: "{{ doc('inner_instruction_index') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: EVENT_TYPE
+        description: "{{ doc('event_type') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: MINT
+        description: "{{ doc('mint') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: TOKEN_ACCOUNT
+        description: "{{ doc('token_account') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: DECIMAL
+        description: "{{ doc('decimal') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: 
+              config:
+                where: >
+                  modified_timestamp >= current_date - 7
+                  AND event_type in ('initializeMint','initializeMint2')
+      - name: MINT_AMOUNT
+        description: "{{ doc('mint_amount') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: 
+              config:
+                where: >
+                  modified_timestamp >= current_date - 7
+                  AND event_type in ('mintTo','mintToChecked')
+      - name: MINT_AUTHORITY
+        description: "{{ doc('mint_authority') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: SIGNERS
+        description:  "{{ doc('signers') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+      - name: FACT_TOKEN_MINT_ACTIONS_ID
+        description: '{{ doc("pk") }}'
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
+          - not_null: *recent_date_filter
