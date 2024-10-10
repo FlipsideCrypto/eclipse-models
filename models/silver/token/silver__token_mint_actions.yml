@@ -1,0 +1,90 @@
+version: 2
+models:
+  - name: silver__token_mint_actions
+    recent_date_filter: &recent_date_filter
+      config:
+        where: _inserted_timestamp >= current_date - 7
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - TX_ID
+            - INDEX
+            - INNER_INDEX
+            - MINT
+          where: block_timestamp::date > current_date - 30
+    columns:
+      - name: BLOCK_TIMESTAMP
+        description: "{{ doc('block_timestamp') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+          - dbt_expectations.expect_row_values_to_have_recent_data:
+              datepart: day
+              interval: 2
+      - name: BLOCK_ID
+        description: "{{ doc('block_id') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: TX_ID
+        description: "{{ doc('tx_id') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: SUCCEEDED
+        description: "{{ doc('tx_succeeded') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: INDEX 
+        description: "{{ doc('event_index') }}"
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: INNER_INDEX 
+        description: "{{ doc('inner_instruction_index') }}"
+      - name: EVENT_TYPE 
+        description: "{{ doc('event_type') }}"
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: MINT 
+        description: "{{ doc('mint') }}"
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: MINT_AMOUNT
+        description: "{{ doc('mint_amount') }}"
+        data_tests: 
+          - not_null:
+              where: event_type in ('mintToChecked', 'mintTo')
+      - name: MINT_AUTHORITY
+        description: "{{ doc('mint_authority') }}"
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: TOKEN_ACCOUNT
+        description: "{{ doc('token_account') }}"
+      - name: SIGNERS
+        description: "{{ doc('signers') }}"
+      - name: DECIMAL
+        description: "{{ doc('decimal') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: MINT_STANDARD_TYPE
+        description: "{{ doc('mint_standard_type') }}"
+      - name: _INSERTED_TIMESTAMP
+        description: "{{ doc('_inserted_timestamp') }}"
+        data_tests: 
+          - not_null
+      - name: TOKEN_MINT_ACTIONS_ID
+        description: '{{ doc("pk") }}'
+        data_tests: 
+          - not_null: *recent_date_filter
+          - unique
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: _INVOCATION_ID
+        description: '{{ doc("_invocation_id") }}' 
+        data_tests: 
+          - not_null:
+              name: test_silver__not_null_token_mint_actions_invocation_id
+              <<: *recent_date_filter
