@@ -25,7 +25,7 @@ SELECT
     block_timestamp,
     tx_id,
     succeeded,
-    index,
+    INDEX,
     inner_index,
     event_type,
     mint,
@@ -35,16 +35,12 @@ SELECT
     signers,
     DECIMAL,
     mint_standard_type,
-        token_mint_actions_id AS fact_token_mint_actions_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp
+    token_mint_actions_id AS fact_token_mint_actions_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp
 FROM
     {{ ref('silver__token_mint_actions') }}
 {% if is_incremental() %}
 WHERE
     modified_timestamp > '{{ max_modified_timestamp }}'
 {% endif %}
-
-    
-
-    

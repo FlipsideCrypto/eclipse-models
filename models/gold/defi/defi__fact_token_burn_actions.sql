@@ -25,7 +25,7 @@ SELECT
     block_timestamp,
     tx_id,
     succeeded,
-    index,
+    INDEX,
     inner_index,
     event_type,
     mint,
@@ -35,10 +35,9 @@ SELECT
     signers,
     DECIMAL,
     mint_standard_type,
-        token_burn_actions_id AS fact_token_burn_actions_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp
-
+    token_burn_actions_id AS fact_token_burn_actions_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp
 FROM
     {{ ref('silver__token_burn_actions') }}
 {% if is_incremental() %}

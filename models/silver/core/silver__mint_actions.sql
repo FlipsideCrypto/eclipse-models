@@ -19,89 +19,89 @@
     {% endif %}
 {% endif %}
 
-with base as (
-        SELECT
+WITH base AS (
+    SELECT
         block_timestamp,
         block_id,
         tx_id,
         succeeded,
-        index,
-        null as inner_index,
+        INDEX,
+        NULL AS inner_index,
         program_id,
         event_type,
         instruction,
         _inserted_timestamp
     FROM
-        {{ ref('silver__events') }} 
-    where event_type in (
-        'mintTo',
-        'initializeMint',
-        'mintToChecked',
-        'initializeMint2',
-        'initializeConfidentialTransferMint',
-        'initializeNonTransferableMint'
-    )
+        {{ ref('silver__events') }}
+    WHERE
+        event_type IN (
+            'mintTo',
+            'initializeMint',
+            'mintToChecked',
+            'initializeMint2',
+            'initializeConfidentialTransferMint',
+            'initializeNonTransferableMint'
+        )
     {% if is_incremental() %}
         AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        AND _inserted_timestamp::date = '2024-09-12'
+        AND _inserted_timestamp :: DATE = '2024-09-12'
     {% endif %}
-    union ALL
-        SELECT
+    UNION ALL
+    SELECT
         block_timestamp,
         block_id,
         tx_id,
         succeeded,
-        instruction_index as index,
+        instruction_index AS INDEX,
         inner_index,
         program_id,
         event_type,
         instruction,
         _inserted_timestamp
     FROM
-        {{ ref('silver__events_inner') }} 
-    where event_type in (
-        'mintTo',
-        'initializeMint',
-        'mintToChecked',
-        'initializeMint2',
-        'initializeConfidentialTransferMint',
-        'initializeNonTransferableMint'
-    )
+        {{ ref('silver__events_inner') }}
+    WHERE
+        event_type IN (
+            'mintTo',
+            'initializeMint',
+            'mintToChecked',
+            'initializeMint2',
+            'initializeConfidentialTransferMint',
+            'initializeNonTransferableMint'
+        )
     {% if is_incremental() %}
         AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
     {% else %}
-        AND _inserted_timestamp::date = '2024-09-12'
+        AND _inserted_timestamp :: DATE = '2024-09-12'
     {% endif %}
 ),
-
-prefinal as (
-SELECT
-    block_id,
-    block_timestamp,
-    tx_id,
-    succeeded,
-    index,
-    inner_index,
-    event_type,
-    instruction :parsed :info :mint :: STRING AS mint,
-    instruction :parsed :info :account :: STRING as token_account, 
-    instruction :parsed :info :decimals :: INTEGER AS DECIMAL,
-    COALESCE(
-        instruction :parsed :info :amount :: INTEGER,
-        instruction :parsed :info :tokenAmount: amount :: INTEGER
-    ) AS mint_amount,
-    COALESCE(
-        instruction :parsed :info :mintAuthority :: string,
-        instruction :parsed :info :multisigMintAuthority :: string,
-        instruction :parsed :info :authority :: string
-    ) AS mint_authority,
-    instruction :parsed :info :signers :: string AS signers,
-    _inserted_timestamp
-FROM
-    base
+prefinal AS (
+    SELECT
+        block_id,
+        block_timestamp,
+        tx_id,
+        succeeded,
+        INDEX,
+        inner_index,
+        event_type,
+        instruction :parsed :info :mint :: STRING AS mint,
+        instruction :parsed :info :account :: STRING AS token_account,
+        instruction :parsed :info :decimals :: INTEGER AS DECIMAL,
+        COALESCE(
+            instruction :parsed :info :amount :: INTEGER,
+            instruction :parsed :info :tokenAmount: amount :: INTEGER
+        ) AS mint_amount,
+        COALESCE(
+            instruction :parsed :info :mintAuthority :: STRING,
+            instruction :parsed :info :multisigMintAuthority :: STRING,
+            instruction :parsed :info :authority :: STRING
+        ) AS mint_authority,
+        instruction :parsed :info :signers :: STRING AS signers,
+        _inserted_timestamp
+    FROM
+        base
 )
-
 SELECT
     block_id,
     block_timestamp,
@@ -134,8 +134,8 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(
         ['tx_id', 'mint', 'index', 'inner_index']
     ) }} AS mint_actions_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     prefinal

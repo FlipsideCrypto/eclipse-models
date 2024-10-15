@@ -1,11 +1,22 @@
 {{ config(
     materialized = 'incremental',
     unique_key = ["mint_types_id"],
-    tags=['scheduled_non_core'],
+    tags = ['scheduled_non_core'],
 ) }}
 
-WITH initialization AS (
+{% if execute %}
+    {% if is_incremental() %}
+    {% set max_inserted_query %}
+    SELECT
+        MAX(_inserted_timestamp) AS _inserted_timestamp
+    FROM
+        {{ this }}
+    {% endset %}
+    {% set max_inserted_timestamp = run_query(max_inserted_query)[0][0] %}
+    {% endif %}
+{% endif %}
 
+WITH initialization AS (
     SELECT
         *,
         CASE
@@ -21,17 +32,11 @@ WITH initialization AS (
             'initializeMint2'
         )
         AND succeeded
-
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
+    {% if is_incremental() %}
+        AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
+    {% endif %}
 ),
-base_metaplex_events as (
+base_metaplex_events AS (
     SELECT
         block_timestamp,
         block_id,
@@ -45,39 +50,28 @@ base_metaplex_events as (
         {{ ref('silver__events') }}
     WHERE
         program_id = 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'
-    and succeeded
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
-union 
+        AND succeeded
+    {% if is_incremental() %}
+        AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
+    {% endif %}
+    UNION
     SELECT
         block_timestamp,
         block_id,
         tx_id,
-        instruction_index as index,
+        instruction_index AS INDEX,
         inner_index,
         program_id,
         instruction :accounts AS accounts,
         ARRAY_SIZE(accounts) AS num_accounts
     FROM
-       {{ ref('silver__events_inner') }}
-        WHERE
+        {{ ref('silver__events_inner') }}
+    WHERE
         program_id = 'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'
-    and succeeded
-{% if is_incremental() %}
-AND _inserted_timestamp >= (
-    SELECT
-        MAX(_inserted_timestamp)
-    FROM
-        {{ this }}
-)
-{% endif %}
-
+        AND succeeded
+    {% if is_incremental() %}
+        AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
+    {% endif %}
 ),
 metaplex_mint_events AS (
     SELECT
@@ -212,24 +206,24 @@ fungibles_and_others AS (
     ORDER BY
         A._inserted_timestamp DESC)) = 1
 ),
-prefinal as (
-SELECT
-    mint,
-    DECIMAL,
-    mint_type,
-    mint_standard_type,
-    _inserted_timestamp
-FROM
-    nonfungibles
-UNION ALL
-SELECT
-    mint,
-    DECIMAL,
-    mint_type,
-    mint_standard_type,
-    _inserted_timestamp
-FROM
-    fungibles_and_others
+prefinal AS (
+    SELECT
+        mint,
+        DECIMAL,
+        mint_type,
+        mint_standard_type,
+        _inserted_timestamp
+    FROM
+        nonfungibles
+    UNION ALL
+    SELECT
+        mint,
+        DECIMAL,
+        mint_type,
+        mint_standard_type,
+        _inserted_timestamp
+    FROM
+        fungibles_and_others
 )
 SELECT
     mint,
@@ -240,9 +234,8 @@ SELECT
     {{ dbt_utils.generate_surrogate_key(
         ['mint']
     ) }} AS mint_types_id,
-    sysdate() AS inserted_timestamp,
-    sysdate() AS modified_timestamp,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM
     prefinal
-

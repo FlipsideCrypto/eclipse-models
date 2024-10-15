@@ -28,6 +28,10 @@ models:
         description: "{{ doc('tx_id') }}"
         data_tests:
           - not_null: *recent_date_filter
+      - name: SUCCEEDED
+        description: "{{ doc('tx_succeeded') }}"
+        tests: 
+          - not_null: *recent_date_filter
       - name: INDEX
         description: "{{ doc('event_index') }}"
         data_tests: 
@@ -65,7 +69,7 @@ models:
       - name: INSERTED_TIMESTAMP
         description: '{{ doc("inserted_timestamp") }}'   
         data_tests: 
-          - not_null: *recent_date_filter
+          - not_null
       - name: MODIFIED_TIMESTAMP
         description: '{{ doc("modified_timestamp") }}' 
         data_tests: 
