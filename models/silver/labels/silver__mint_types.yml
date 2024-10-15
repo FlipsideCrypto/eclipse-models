@@ -19,7 +19,7 @@ models:
           - not_null: *recent_date_filter
       - name: MINT_STANDARD_TYPE
         description: "{{ doc('mint_standard_type') }}"
-     - name: _INSERTED_TIMESTAMP
+      - name: _INSERTED_TIMESTAMP
         description: "{{ doc('_inserted_timestamp') }}"
         tests: 
           - not_null
