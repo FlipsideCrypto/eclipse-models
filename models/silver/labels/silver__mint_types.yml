@@ -1,0 +1,43 @@
+version: 2
+models:
+  - name: silver__mint_types
+    recent_date_filter: &recent_date_filter
+      config:
+        where: _inserted_timestamp >= current_date - 7
+    columns:
+      - name: MINT
+        description: "{{ doc('mint') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: DECIMAL
+        description: "{{ doc('decimal') }}"
+        tests:
+          - not_null: *recent_date_filter
+      - name: MINT_TYPE
+        description: "{{ doc('mint_type') }}"
+        data_tests:
+          - not_null: *recent_date_filter
+      - name: MINT_STANDARD_TYPE
+        description: "{{ doc('mint_standard_type') }}"
+      - name: _INSERTED_TIMESTAMP
+        description: "{{ doc('_inserted_timestamp') }}"
+        tests: 
+          - not_null
+      - name: MINT_TYPES_ID
+        description: '{{ doc("pk") }}'
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: INSERTED_TIMESTAMP
+        description: '{{ doc("inserted_timestamp") }}'   
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: MODIFIED_TIMESTAMP
+        description: '{{ doc("modified_timestamp") }}' 
+        data_tests: 
+          - not_null: *recent_date_filter
+      - name: _INVOCATION_ID
+        description: '{{ doc("_invocation_id") }}' 
+        data_tests: 
+          - not_null:
+              name: test_silver__not_null_mint_types_invocation_id
+              <<: *recent_date_filter
