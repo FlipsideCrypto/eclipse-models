@@ -1,5 +1,6 @@
 {{ config(
     materialized = 'incremental',
+    meta ={ 'database_tags':{ 'table':{ 'PURPOSE': 'Token' }}},
     unique_key = ["fact_token_mint_actions_id"],
     incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     merge_exclude_columns = ["inserted_timestamp"],
