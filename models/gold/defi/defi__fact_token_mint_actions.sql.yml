@@ -85,6 +85,10 @@ models:
         description:  "{{ doc('signers') }}"
         data_tests:
           - dbt_expectations.expect_column_to_exist
+      - name: MINT_STANDARD_TYPE
+        description: "{{ doc('mint_standard_type') }}"
+        data_tests:
+          - dbt_expectations.expect_column_to_exist
       - name: FACT_TOKEN_MINT_ACTIONS_ID
         description: '{{ doc("pk") }}'
         data_tests:
