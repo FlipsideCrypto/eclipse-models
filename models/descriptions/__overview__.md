@@ -28,7 +28,11 @@ There is more information on how to use dbt docs in the last section of this doc
 
 
 ### Governance Tables (`Eclipse`.`GOV`.`<table_name>`)
-- [fact_votes](#!/model/model.eclipse_models.core__fact_votes)
+- [fact_votes](#!/model/model.eclipse_models.gov__fact_votes)
+
+### DeFi Tables (`Eclipse`.`DEFI`.`<table_name>`)
+- [fact_token_mint_actions](#!/model/model.eclipse_models.defi__fact_token_mint_actions)
+- [fact_token_burn_actions](#!/model/model.eclipse_models.defi__fact_token_burn_actions)
 
 
 
