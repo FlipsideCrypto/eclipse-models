@@ -6,7 +6,7 @@
 SELECT
     {{ target.database }}.live.udf_api(
         'POST',
-        'https://eclipse.lgns.net:443',
+        '{Service}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json',
@@ -22,5 +22,6 @@ SELECT
             'getSlot',
             'params',
             []
-        )
+        ),
+        'Vault/prod/eclipse/mainnet'
     ) :data :result :: INT AS block_id
