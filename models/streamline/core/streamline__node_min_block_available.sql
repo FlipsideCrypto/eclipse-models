@@ -4,12 +4,12 @@
 ) }}
 
 {% set block_to_check = 0 %}
-
 WITH node_response AS (
+
     SELECT
         {{ target.database }}.live.udf_api(
             'POST',
-            'https://eclipse.lgns.net:443',
+            '{Service}',
             OBJECT_CONSTRUCT(
                 'Content-Type',
                 'application/json'
@@ -28,24 +28,27 @@ WITH node_response AS (
                         'encoding',
                         'jsonParsed',
                         'rewards',
-                        False,
+                        FALSE,
                         'transactionDetails',
                         'none',
                         'maxSupportedTransactionVersion',
                         0
                     )
                 )
-            )
-        ) AS data
+            ),
+            'Vault/prod/eclipse/mainnet'
+        ) AS DATA
 )
-SELECT 
-    data:data:error:code::int AS error_code,
-    data:data:error:message::string AS error_message,
+SELECT
+    DATA :data :error :code :: INT AS error_code,
+    DATA :data :error :message :: STRING AS error_message,
     CASE
-        WHEN error_code = -32001 THEN
-            split_part(error_message,'available block: ',2)::int
-        ELSE
-            {{ block_to_check }}
+        WHEN error_code = -32001 THEN SPLIT_PART(
+            error_message,
+            'available block: ',
+            2
+        ) :: INT
+        ELSE {{ block_to_check }}
     END AS block_id
-FROM 
+FROM
     node_response

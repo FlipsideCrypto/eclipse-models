@@ -1,4 +1,4 @@
-  -- depends_on: {{ ref('streamline__node_min_block_available') }}
+-- depends_on: {{ ref('streamline__node_min_block_available') }}
 {{ config (
     materialized = "view",
     post_hook = fsc_utils.if_data_call_function_v2(
@@ -16,26 +16,30 @@
 
 {% if execute %}
     {% set min_block_query %}
-    SELECT min(block_id) FROM {{ ref('streamline__node_min_block_available') }}
-    {% endset %}
 
-    {% set min_block_id = run_query(min_block_query)[0][0] %}
-{% endif %}
+    SELECT
+        MIN(block_id)
+    FROM
+        {{ ref('streamline__node_min_block_available') }}
 
-WITH blocks AS (
-    SELECT
-        block_id
-    FROM
-        {{ ref("streamline__blocks") }}
-    WHERE
-        /* Find the earliest block available from the node provider */
-        block_id >= 6572203
-    EXCEPT
-    SELECT
-        block_id
-    FROM
-        {{ ref('streamline__block_txs_complete') }}
-)
+        {% endset %}
+        {% set min_block_id = run_query(min_block_query) [0] [0] %}
+    {% endif %}
+
+    WITH blocks AS (
+        SELECT
+            block_id
+        FROM
+            {{ ref("streamline__blocks") }}
+        WHERE
+            /* Find the earliest block available from the node provider */
+            block_id >= 6572203
+        EXCEPT
+        SELECT
+            block_id
+        FROM
+            {{ ref('streamline__block_txs_complete') }}
+    )
 SELECT
     block_id,
     ROUND(
@@ -44,7 +48,7 @@ SELECT
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
         'POST',
-        'https://eclipse.lgns.net:443',
+        '{Service}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json'
@@ -63,14 +67,15 @@ SELECT
                     'encoding',
                     'jsonParsed',
                     'rewards',
-                    False,
+                    FALSE,
                     'transactionDetails',
                     'full',
                     'maxSupportedTransactionVersion',
                     0
                 )
             )
-        )
+        ),
+        'Vault/prod/eclipse/mainnet'
     ) AS request
 FROM
     blocks
