@@ -22,12 +22,13 @@ FROM
     {{ ref('silver__labels') }}
 
 {% if is_incremental() %}
-AND modified_timestamp >= (
-    SELECT
-        max(
-            modified_timestamp
-        )
-    FROM
-        {{ this }}
-)
+WHERE 
+    modified_timestamp >= (
+        SELECT
+            max(
+                modified_timestamp
+            )
+        FROM
+            {{ this }}
+    )
 {% endif %}
