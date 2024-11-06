@@ -20,6 +20,7 @@ sources:
     tables:
       - name: number_sequence
       - name: complete_native_prices
+      - name: labels_combined
   - name: github_actions
     database: ECLIPSE
     schema: github_actions

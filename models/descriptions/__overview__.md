@@ -25,6 +25,7 @@ There is more information on how to use dbt docs in the last section of this doc
 - [fact_events_inner](#!/model/model.eclipse_models.core__fact_events_inner)
 - [fact_transactions](#!/model/model.eclipse_models.core__fact_transactions)
 - [fact_transfers](#!/model/model.eclipse_models.core__fact_transfers)
+- [dim_labels](#!/model/model.eclipse_models.core__dim_labels)
 
 
 ### Governance Tables (`Eclipse`.`GOV`.`<table_name>`)

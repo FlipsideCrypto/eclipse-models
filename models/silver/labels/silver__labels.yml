@@ -1,0 +1,26 @@
+version: 2
+models:
+  - name: silver__labels
+    columns:
+      - name: BLOCKCHAIN
+        description: "{{ doc('blockchain') }}"
+      - name: ADDRESS
+        description: "{{ doc('address') }}"
+      - name: CREATOR
+        description: "{{ doc('creator') }}"
+      - name: LABEL_TYPE
+        description: "{{ doc('label_type') }}" 
+      - name: LABEL_SUBTYPE
+        description: "{{ doc('label_subtype') }}"
+      - name: ADDRESS_NAME
+        description: "{{ doc('address_name') }}"
+      - name: PROJECT_NAME
+        description: "{{ doc('label') }}"
+      - name: _IS_DELETED
+      - name: LABELS_COMBINED_ID
+        description: "{{ doc('pk') }}"
+      - name: INSERTED_TIMESTAMP
+        description: "{{ doc('inserted_timestamp') }}"   
+      - name: MODIFIED_TIMESTAMP
+        description: "{{ doc('modified_timestamp') }}" 
+      
