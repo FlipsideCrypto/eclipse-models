@@ -42,10 +42,8 @@ models:
     deploy:
       core:
         materialized: ephemeral
-
-vars:
-  "dbt_date:time_zone": GMT
-  "UPDATE_SNOWFLAKE_TAGS": TRUE
+  eclipse_models:
+    +pre-hook: '{{ fsc_utils.set_query_tag() }}'
 
 tests:
   +store_failures: true # all tests
@@ -77,6 +75,12 @@ vars:
   STREAMLINE_RETRY_UNKNOWN: False
   UPDATE_SNOWFLAKE_TAGS: True
   UPDATE_UDFS_AND_SPS: False 
+  core_folders: [
+    'silver/core',
+    'gold/core',
+    'bronze/streamline',  
+    'streamline/core'
+  ]
 
   API_INTEGRATION: '{{ var("config")[target.name]["API_INTEGRATION"] if var("config")[target.name] else var("config")["dev"]["API_INTEGRATION"] }}'
   EXTERNAL_FUNCTION_URI: '{{ var("config")[target.name]["EXTERNAL_FUNCTION_URI"] if var("config")[target.name] else var("config")["dev"]["EXTERNAL_FUNCTION_URI"] }}'
