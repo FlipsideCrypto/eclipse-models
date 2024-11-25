@@ -1,13 +1,14 @@
 {{ config(
     materialized = 'incremental',
-    tags = ['scheduled_non_core']
+    tags = ['scheduled_non_core'],
+    full_refresh = false
 ) }}
 
 WITH lq AS (
 
     SELECT
         {{ target.database }}.live.udf_api(
-            '{Service}main/info',
+            '{Service}/main/info',
             'Vault/prod/eclipse/solar_dex'
         ) :data :data AS response
 )

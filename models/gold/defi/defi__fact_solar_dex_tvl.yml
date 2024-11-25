@@ -7,7 +7,7 @@ models:
         where: modified_timestamp >= current_date - 7
     columns:
       - name: recorded_at
-        description: "the data the tvl was recorded"
+        description: "the date the tvl was recorded"
         data_tests:
           - dbt_expectations.expect_row_values_to_have_recent_data:
               datepart: day
