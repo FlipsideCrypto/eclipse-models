@@ -2,10 +2,22 @@ version: 2
 models:
   - name: defi__fact_solar_dex_tvl
     description: Contains tvl for solar dex - data starts as of 2024-11-25
+    recent_date_filter: &recent_date_filter
+      config:
+        where: modified_timestamp >= current_date - 7
     columns:
-      - name: BLOCK_DATE
-        description: "{{ doc('block_timestamp') }}"
+      - name: recorded_at
+        description: "the data the tvl was recorded"
         data_tests:
           - dbt_expectations.expect_row_values_to_have_recent_data:
               datepart: day
               interval: 2
+      - name: tvl
+        data_tests:
+         - not_null: *recent_date_filter
+      - name: users
+        data_tests:
+         - not_null: *recent_date_filter
+      - name: volume_24
+        data_tests:
+         - not_null: *recent_date_filter

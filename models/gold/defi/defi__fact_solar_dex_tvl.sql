@@ -1,21 +1,24 @@
 {{ config(
     materialized = 'incremental',
-    unique_key = ["block_date"],
     tags = ['scheduled_non_core']
 ) }}
 
 WITH lq AS (
 
     SELECT
-        {{ target.database }}.live.udf_api('https://api.solarstudios.co/main/info') :data :data AS response
+        {{ target.database }}.live.udf_api(
+            '{Service}main/info',
+            'Vault/prod/eclipse/solar_dex'
+        ) :data :data AS response
 )
 SELECT
-    SYSDATE() :: DATE AS block_date,
+    SYSDATE() AS recorded_at,
+    'sooGfQwJ6enHfLTPfasFZtFR7DgobkJD77maDNEqGkD' AS program_id,
     response :tvl :: FLOAT AS tvl,
     response :users :: INT AS users,
     response :volume24 :: FLOAT AS volume_24,
     {{ dbt_utils.generate_surrogate_key(
-        ['block_date']
+        ['recorded_at']
     ) }} AS fact_solar_dex_tvl_id,
     SYSDATE() AS inserted_timestamp,
     SYSDATE() AS modified_timestamp
