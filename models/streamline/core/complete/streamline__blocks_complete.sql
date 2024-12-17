@@ -26,6 +26,7 @@ WHERE
         FROM
             {{ this }}
     )
+    AND data IS NOT NULL
 {% else %}
     {{ ref('bronze__FR_blocks') }}
 {% endif %}
