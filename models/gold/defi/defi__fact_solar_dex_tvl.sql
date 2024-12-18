@@ -25,3 +25,5 @@ SELECT
     SYSDATE() AS modified_timestamp
 FROM
     lq
+WHERE
+    response IS NOT NULL
