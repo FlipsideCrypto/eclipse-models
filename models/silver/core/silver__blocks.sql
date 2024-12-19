@@ -43,6 +43,7 @@ WITH pre_final AS (
     WHERE
         block_id IS NOT NULL
         AND error IS NULL
+        AND data IS NOT NULL
         {% if is_incremental() %}
         AND _inserted_timestamp >= '{{ max_inserted_timestamp }}'
         {% endif %}

@@ -24,4 +24,4 @@ SELECT
             []
         ),
         'Vault/prod/eclipse/mainnet'
-    ) :data :result :: INT AS block_id
+    ) :data :result :: INT - 50 AS block_id
