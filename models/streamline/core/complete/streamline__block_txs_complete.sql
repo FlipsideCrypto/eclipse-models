@@ -26,6 +26,15 @@ WHERE
         FROM
             {{ this }}
     )
+    AND partition_key > (
+        SELECT
+            COALESCE(
+                MAX(partition_key),
+                0
+            )
+        FROM
+            {{ this }}
+    )
 {% else %}
     {{ ref('bronze__FR_transactions') }}
 {% endif %}
