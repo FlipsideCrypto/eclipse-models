@@ -229,7 +229,7 @@ def get_logs_program_data(logs) -> list:
                 break
         return bytes(result)
 
-    def is_solana_program_id(s):
+    def is_eclipse_program_id(s):
         return len(base58_decode(s)) == 32
     
     def is_base64(s):
@@ -305,7 +305,7 @@ def get_logs_program_data(logs) -> list:
             else:
                 maybe_program_id = ""
 
-            if is_solana_program_id(maybe_program_id):
+            if is_eclipse_program_id(maybe_program_id):
                 current_program_id = current_ancestry[-1][0]
                 current_event_type = current_ancestry[-1][2]
                 current_index = parent_index

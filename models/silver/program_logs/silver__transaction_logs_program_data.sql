@@ -14,6 +14,7 @@ WITH base AS (
         block_id,
         tx_id,
         succeeded,
+        signers,
         silver.udf_get_logs_program_data(log_messages) AS program_data_logs,
         _inserted_timestamp
     FROM 
@@ -30,6 +31,7 @@ SELECT
     t.block_id,
     t.tx_id,
     t.succeeded,
+    t.signers,
     l.value:index::int AS index,
     l.value:inner_index::int AS inner_index,
     l.index AS log_index,
