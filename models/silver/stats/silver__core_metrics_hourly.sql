@@ -54,7 +54,7 @@ WITH block_stats AS (
     WHERE
         block_timestamp_hour < DATE_TRUNC(
             'hour',
-            CURRENT_TIMESTAMP
+            DATEADD('hour', -1, CURRENT_TIMESTAMP)
         )
         {% if is_incremental() %}
         AND block_timestamp :: DATE IN(
@@ -78,7 +78,7 @@ tx_stats_base AS (
         block_timestamp IS NOT NULL
         AND block_timestamp_hour < DATE_TRUNC(
             'hour',
-            CURRENT_TIMESTAMP
+            DATEADD('hour', -1, CURRENT_TIMESTAMP)
         )
         {% if is_incremental() %}
         AND block_timestamp :: DATE IN(
@@ -99,7 +99,7 @@ tx_stats_base AS (
         block_timestamp IS NOT NULL
         AND block_timestamp_hour < DATE_TRUNC(
             'hour',
-            CURRENT_TIMESTAMP
+            DATEADD('hour', -1, CURRENT_TIMESTAMP)
         )
         {% if is_incremental() %}
         AND block_timestamp :: DATE IN(
