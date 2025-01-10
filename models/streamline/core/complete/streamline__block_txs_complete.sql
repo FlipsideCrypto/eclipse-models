@@ -26,12 +26,12 @@ WHERE
         FROM
             {{ this }}
     )
-    AND partition_key > (
+    AND partition_key >= (
         SELECT
             COALESCE(
                 MAX(partition_key),
                 0
-            ) - 100000
+            )
         FROM
             {{ this }}
     )
