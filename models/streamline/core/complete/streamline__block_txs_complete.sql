@@ -31,7 +31,7 @@ WHERE
             COALESCE(
                 MAX(partition_key),
                 0
-            ) - 300000
+            ) - 200000
         FROM
             {{ this }}
     )
