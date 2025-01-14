@@ -46,6 +46,8 @@ prefinal as (
     JOIN 
         table(flatten(program_data_logs)) l
 )
+-- for logs with null 'data', we only need to return a single log per tx/program_id/event_type since additional entries are not useful
+-- if the log does have 'data', we always return it
 SELECT 
     *,
     {{ dbt_utils.generate_surrogate_key(
