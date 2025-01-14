@@ -195,3 +195,161 @@ def get_all_inner_instruction_program_ids(inner_instruction) -> list:
     return program_ids
 $$;
 {% endmacro %}
+
+{% macro create_udf_get_logs_program_data(schema) %}
+create or replace function {{ schema }}.udf_get_logs_program_data(logs array)
+returns array
+language python
+runtime_version = '3.8'
+handler = 'get_logs_program_data'
+AS
+$$
+import re
+import base64
+
+def get_logs_program_data(logs) -> list:
+    def base58_decode(s):
+        base58_chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+        base58_base = len(base58_chars)
+        num = 0
+        for char in s:
+            num *= base58_base
+            if char not in base58_chars:
+                return b""
+            num += base58_chars.index(char)
+        result = bytearray()
+        while num > 0:
+            num, mod = divmod(num, 256)
+            result.insert(0, mod)
+        # Handle leading zeros in Base58 string
+        for char in s:
+            if char == '1':
+                result.insert(0, 0)
+            else:
+                break
+        return bytes(result)
+
+    def is_eclipse_program_id(s):
+        return len(base58_decode(s)) == 32
+    
+    def is_base64(s):
+        if not re.match(r'^[A-Za-z0-9+/]*={0,2}$', s):
+            return False
+        
+        if len(s) % 4 != 0:
+            return False
+        
+        try:
+            decoded = base64.b64decode(s)
+            printable_ratio = sum(32 <= byte <= 126 for byte in decoded) / len(decoded)
+            if printable_ratio > 0.9:
+                return False
+            return True
+        except:
+            return False
+
+    program_data = []
+    parent_event_type = ""
+    child_event_type = ""
+    parent_index = -1
+    child_index = None
+    current_ancestry = []
+
+    program_end_pattern = re.compile(r"Program ([a-zA-Z0-9]+) success")
+    pattern = re.compile(r'invoke \[(?!1\])\d+\]')
+
+    if len(logs) == 1:
+        return None
+
+    try:
+        for i, log in enumerate(logs):
+            if log == "Log truncated":
+                break
+
+            if log.endswith(" invoke [1]"):
+                child_index = None
+                program = log.replace("Program ","").replace(" invoke [1]","")
+                parent_index += 1
+
+                if i+1 < len(logs) and logs[i+1].startswith("Program log: Instruction: "):
+                    parent_event_type = logs[i+1].replace("Program log: Instruction: ","")
+                elif i+1 < len(logs) and logs[i+1].startswith("Program log: IX: "):
+                    parent_event_type = logs[i+1].replace("Program log: IX: ","")
+                else:
+                    parent_event_type = "UNKNOWN"
+
+                current_ancestry = [(program,None,parent_event_type)]
+            elif log.startswith("Call BPF program ") or log.startswith("Upgraded program "): # handle legacy BPF log format
+                # remove legacy log parsing code it is not compatible w/ new
+                continue
+            elif bool(pattern.search(log)):
+                child_index = child_index+1 if child_index is not None else 0
+                current_program = pattern.sub('', log.replace("Program ","")).strip()
+                current_node = int(pattern.search(log)[0].replace("invoke [","").replace("]",""))
+
+                if i+1 < len(logs) and logs[i+1].startswith("Program log: Instruction: "):
+                    child_event_type = logs[i+1].replace("Program log: Instruction: ","")
+                elif i+1 < len(logs) and logs[i+1].startswith("Program log: IX: "):
+                    child_event_type = logs[i+1].replace("Program log: IX: ","")
+                else:
+                    child_event_type = "UNKNOWN"
+
+                if len(current_ancestry) >= current_node:
+                    current_ancestry[current_node-1] = (current_program, child_index, child_event_type)
+                else:
+                    current_ancestry.append((current_program, child_index, child_event_type))
+            
+            maybe_program_end = program_end_pattern.search(log)
+            if maybe_program_end:
+                maybe_program_id = maybe_program_end.group(1)
+            else:
+                maybe_program_id = ""
+
+            if is_eclipse_program_id(maybe_program_id):
+                current_program_id = current_ancestry[-1][0]
+                current_event_type = current_ancestry[-1][2]
+                current_index = parent_index
+                current_inner_index = current_ancestry[-1][1]
+                current_ancestry.pop()
+            else:
+                current_program_id = current_ancestry[-1][0]
+                current_event_type = current_ancestry[-1][2]
+                current_index = parent_index
+                current_inner_index = current_ancestry[-1][1]
+            
+            if log.startswith("Program data: "): 
+                data = log.replace("Program data: ", "")
+                if program_data and program_data[-1]["data"] is None:
+                    # Update the most recent entry
+                    program_data[-1]["data"] = data
+                else:
+                    # Append new entry if not found
+                    program_data.append({
+                        "data": data, 
+                        "program_id": current_program_id, 
+                        "index": current_index, 
+                        "inner_index": current_inner_index, 
+                        "event_type": current_event_type
+                    })
+            elif log.startswith("Program log: "):
+                data = log.replace("Program log: ", "")
+                if is_base64(data):
+                    program_data.append({"data": data, 
+                                        "program_id": current_program_id, 
+                                        "index": current_index, 
+                                        "inner_index": current_inner_index, 
+                                        "event_type": current_event_type})
+                    break
+                elif current_program_id != "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" and current_program_id != "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb" and current_event_type != "UNKNOWN":
+                    program_data.append({"data": None,
+                                        "program_id": current_program_id,
+                                        "index": current_index,
+                                        "inner_index": current_inner_index,
+                                        "event_type": current_event_type})
+    except Exception as e:
+        message = f"error trying to parse logs {e}"
+        return [{"error": message}]
+    
+    return program_data if len(program_data) > 0 else None
+$$;
+{% endmacro %}

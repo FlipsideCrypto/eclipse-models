@@ -10,6 +10,7 @@
         {{ create_udf_get_compute_units_total(schema = "silver") }}
         {{ create_udf_get_tx_size(schema = "silver") }}
         {{ create_udf_get_all_inner_instruction_program_ids(schema = "silver") }}
+        {{ create_udf_get_logs_program_data(schema = "silver") }}
         {% endset %}
         {% do run_query(sql) %}
     {% endif %}
