@@ -25,21 +25,29 @@ WITH base AS (
         {% if is_incremental() %}
         AND _inserted_timestamp >= (SELECT max(_inserted_timestamp) FROM {{ this }}) 
         {% endif %}
+),
+prefinal as (
+    SELECT 
+        t.block_timestamp,
+        t.block_id,
+        t.tx_id,
+        t.succeeded,
+        t.signers,
+        l.value:index::int AS index,
+        l.value:inner_index::int AS inner_index,
+        l.index AS log_index,
+        l.value:program_id::string AS program_id,
+        l.value:event_type::string AS event_type,
+        l.value:data::string AS data,
+        l.value:error::string AS _udf_error,
+        _inserted_timestamp
+    FROM 
+        base t
+    JOIN 
+        table(flatten(program_data_logs)) l
 )
 SELECT 
-    t.block_timestamp,
-    t.block_id,
-    t.tx_id,
-    t.succeeded,
-    t.signers,
-    l.value:index::int AS index,
-    l.value:inner_index::int AS inner_index,
-    l.index AS log_index,
-    l.value:program_id::string AS program_id,
-    l.value:event_type::string AS event_type,
-    l.value:data::string AS data,
-    l.value:error::string AS _udf_error,
-    _inserted_timestamp,
+    *,
     {{ dbt_utils.generate_surrogate_key(
         ['tx_id','index','log_index']
     ) }} AS transaction_logs_program_data_id,
@@ -47,6 +55,20 @@ SELECT
     SYSDATE() AS modified_timestamp,
     '{{ invocation_id }}' AS _invocation_id
 FROM 
-    base t
-JOIN 
-    table(flatten(program_data_logs)) l
+    prefinal
+WHERE 
+    data IS NULL
+QUALIFY (ROW_NUMBER() OVER (PARTITION BY tx_id, index, inner_index, program_id, event_type ORDER BY log_index DESC)) = 1
+UNION ALL
+SELECT 
+    *,
+    {{ dbt_utils.generate_surrogate_key(
+        ['tx_id','index','log_index']
+    ) }} AS transaction_logs_program_data_id,
+    SYSDATE() AS inserted_timestamp,
+    SYSDATE() AS modified_timestamp,
+    '{{ invocation_id }}' AS _invocation_id
+FROM 
+    prefinal
+WHERE 
+    data IS NOT NULL
