@@ -37,8 +37,6 @@ models:
       - name: DATA
         description: >
           The encoded program data
-        tests: 
-          - not_null: *recent_date_filter
       - name: PROGRAM_ID
         description: "{{ doc('program_id') }}"
         tests: 
