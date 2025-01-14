@@ -58,7 +58,7 @@ FROM
     prefinal
 WHERE 
     data IS NULL
-QUALIFY (ROW_NUMBER() OVER (PARTITION BY tx_id, index, inner_index, program_id, event_type ORDER BY log_index DESC)) = 1
+QUALIFY (ROW_NUMBER() OVER (PARTITION BY tx_id, program_id, event_type ORDER BY log_index DESC)) = 1
 UNION ALL
 SELECT 
     *,
