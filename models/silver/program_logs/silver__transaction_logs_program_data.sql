@@ -22,6 +22,7 @@ WITH base AS (
     WHERE 
         succeeded
         AND log_messages IS NOT NULL
+        AND block_timestamp IS NOT NULL
         {% if is_incremental() %}
         AND _inserted_timestamp >= (SELECT max(_inserted_timestamp) FROM {{ this }}) 
         {% endif %}
