@@ -44,7 +44,7 @@ SELECT
     block_id,
     ROUND(
         block_id,
-        -5
+        -4
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
         'POST',
