@@ -5,7 +5,7 @@
     materialized = "incremental",
     unique_key = 'block_id',
     merge_exclude_columns = ["inserted_timestamp"],
-    cluster_by = "ROUND(block_id, -5)",
+    cluster_by = "ROUND(block_id, -4)",
 ) }}
 
 SELECT
