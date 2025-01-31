@@ -3,7 +3,7 @@
 {{ config(
     materialized = 'incremental',
     unique_key = "tx_id",
-    incremental_predicates = ["coalesce(DBT_INTERNAL_DEST.block_timestamp,'2999-12-31') >= (select coalesce(min(block_timestamp),'2000-01-01') from " ~ generate_tmp_view_name(this) ~ ")"],
+    incremental_predicates = ["dynamic_range_predicate", "block_timestamp::date"],
     cluster_by = ['block_timestamp::DATE','_inserted_timestamp::DATE'],
     merge_exclude_columns = ["inserted_timestamp"],
     tags = ['scheduled_core']
