@@ -7,7 +7,7 @@
         params ={ "external_table" :"block_txs",
         "sql_limit" :"20000",
         "producer_batch_size" :"20000",
-        "worker_batch_size" :"500",
+        "worker_batch_size" :"250",
         "sql_source" :"{{this.identifier}}",
         "order_by_column": "block_id",
         "exploded_key": tojson(["result.transactions"]) }
