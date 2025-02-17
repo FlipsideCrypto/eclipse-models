@@ -28,7 +28,7 @@ models:
           - unique:
               config:
                 where: >
-                  block_timestamp::date > current_date - 30
+                  _inserted_timestamp::date >= current_date - 7
       - name: INDEX
         description: "{{ doc('tx_index') }}"
         tests:
