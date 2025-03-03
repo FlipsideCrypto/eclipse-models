@@ -16,7 +16,6 @@
     )
 ) }}
 
--- TO-DO: use min_block_id OR remove it and use static cutoff like solana
 -- TODO: update sql_limit to 20000
 
 {% if execute %}
