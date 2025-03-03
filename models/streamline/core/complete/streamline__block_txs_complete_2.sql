@@ -11,7 +11,6 @@
 
 SELECT
     block_id,
-    error,
     partition_key,
     _inserted_timestamp,
     sysdate() AS inserted_timestamp,
