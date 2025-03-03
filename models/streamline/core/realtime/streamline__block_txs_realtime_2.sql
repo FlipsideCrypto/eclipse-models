@@ -5,18 +5,19 @@
         func = 'streamline.udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"block_txs_2",
-        "sql_limit" :"20000",
+        "sql_limit" :"10",
         "producer_batch_size" :"20000",
         "worker_batch_size" :"500",
         "async_concurrent_requests": "10",
         "exploded_key": tojson(["result.transactions"]),
         "include_top_level_json": tojson(["result.blockTime"]),
         "sql_source" :"{{this.identifier}}",
-        "order_by_column": "block_id", }
+        "order_by_column": "block_id" }
     )
 ) }}
 
 -- TO-DO: use min_block_id OR remove it and use static cutoff like solana
+-- TODO: update sql_limit to 20000
 
 {% if execute %}
     {% set min_block_query %}
