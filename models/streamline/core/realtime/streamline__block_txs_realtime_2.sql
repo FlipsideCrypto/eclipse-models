@@ -5,7 +5,7 @@
         func = 'streamline.udf_bulk_rest_api_v2',
         target = "{{this.schema}}.{{this.identifier}}",
         params ={ "external_table" :"block_txs_2",
-        "sql_limit" :"10",
+        "sql_limit" :"20000",
         "producer_batch_size" :"20000",
         "worker_batch_size" :"500",
         "async_concurrent_requests": "10",
@@ -15,8 +15,6 @@
         "order_by_column": "block_id" }
     )
 ) }}
-
--- TODO: update sql_limit to 20000
 
 {% if execute %}
     {% set min_block_query %}
@@ -36,14 +34,14 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 49901565 /* TODO: cutoff block_id in PROD after deploy */
+        block_id >= 52500858 
     EXCEPT
     SELECT
         block_id
     FROM
         {{ ref('streamline__block_txs_complete') }}
     WHERE
-        block_id <= 49901565 /* TODO: cutoff block_id in PROD after deploy */
+        block_id <= 52500858 
     EXCEPT
     SELECT 
         block_id
