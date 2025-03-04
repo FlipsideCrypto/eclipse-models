@@ -19,7 +19,9 @@ WITH meta AS (
 )
 SELECT
     {{ unique_key }},
+    {% if other_cols is not none and other_cols != "" %}
     {{ other_cols }},
+    {% endif %}
     DATA,
     _inserted_timestamp,
     s.{{ partition_name }},
@@ -64,7 +66,9 @@ WITH meta AS (
 )
 SELECT
     {{ unique_key }},
+    {% if other_cols is not none and other_cols != "" %}
     {{ other_cols }},
+    {% endif %}
     DATA,
     _inserted_timestamp,
     s.{{ partition_name }},

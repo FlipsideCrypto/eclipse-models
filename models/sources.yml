@@ -7,6 +7,7 @@ sources:
     tables:
       - name: blocks
       - name: block_txs
+      - name: block_txs_2
   - name: crosschain
     database: "{{ 'crosschain' if target.database == 'ECLIPSE' else 'crosschain_dev' }}"
     schema: core
