@@ -83,7 +83,7 @@ SELECT
                 )
             )
         ),
-        'Vault/prod/eclipse/mainnet'
+        'Vault/prod/eclipse/private/mainnet'
     ) AS request
 FROM
     blocks
