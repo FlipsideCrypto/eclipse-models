@@ -21,6 +21,8 @@
     {% endif %}
 {% endif %}
 
+{% set cutover_block_id = 307103862 %}
+
 WITH pre_final AS (
     SELECT
         b.block_timestamp AS block_timestamp,
@@ -58,7 +60,8 @@ WITH pre_final AS (
         {{ ref('silver__blocks') }} b
         ON b.block_id = t.block_id
     WHERE
-        tx_id IS NOT NULL
+        t.block_id < {{cutover_block_id}}
+        AND tx_id IS NOT NULL
         AND (
             coalesce(t.data:transaction:message:instructions[0]:programId::STRING,'') <> 'Vote111111111111111111111111111111111111111'
             OR array_size(t.data:transaction:message:instructions) > 1
@@ -67,6 +70,51 @@ WITH pre_final AS (
         AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
         {% else %}
         AND t._inserted_timestamp::date = '2024-09-12'
+        {% endif %}
+    UNION ALL
+    SELECT
+        to_timestamp_ntz(t.value:"result.blockTime"::int) AS block_timestamp,
+        t.block_id,
+        t.data:transaction:signatures[0]::string AS tx_id,
+        t.value:array_index as index,
+        t.data:transaction:message:recentBlockhash::string AS recent_block_hash,
+        t.data:meta:fee::number AS fee,
+        CASE
+            WHEN is_null_value(t.data:meta:err) THEN 
+                TRUE
+            ELSE 
+                FALSE
+        END AS succeeded,
+        t.data:transaction:message:accountKeys::array AS account_keys,
+        t.data:meta:preBalances::array AS pre_balances,
+        t.data:meta:postBalances::array AS post_balances,
+        t.data:meta:preTokenBalances::array AS pre_token_balances,
+        t.data:meta:postTokenBalances::array AS post_token_balances,
+        t.data:transaction:message:instructions::array AS instructions,
+        t.data:meta:innerInstructions::array AS inner_instructions,
+        t.data:meta:logMessages::array AS log_messages,
+        t.data:transaction:message:addressTableLookups::array as address_table_lookups,
+        t.data :meta :computeUnitsConsumed :: NUMBER as units_consumed,
+        t.data:version::string as version,
+        t.partition_key,
+        t._inserted_timestamp
+    FROM
+        {{ ref('bronze__transactions_2') }} AS t
+    WHERE
+        t.block_id >= {{ cutover_block_id }}
+        AND tx_id IS NOT NULL
+        AND (
+            COALESCE(t.data :transaction :message :instructions [0] :programId :: STRING,'') <> 'Vote111111111111111111111111111111111111111'
+            OR
+            (
+                array_size(t.data :transaction :message :instructions) > 1
+            )
+        )
+        {% if is_incremental() %}
+        AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
+        {% else %}
+        AND t._inserted_timestamp::date = '2024-09-12'
+        AND t._partition_id < 0 /* KEEP THIS FROM SOLANA repo?? keep this here, if we ever do a full refresh this should select no data from streamline 2.0 data */
         {% endif %}
 ),
 {% if is_incremental() %}
