@@ -76,7 +76,7 @@ SELECT
                 )
             )
         ),
-        'Vault/prod/eclipse/private/mainnet'
+        'Vault/prod/eclipse/mainnet'
     ) AS request
 FROM
     blocks
