@@ -36,7 +36,7 @@ WITH node_response AS (
                     )
                 )
             ),
-            'Vault/prod/eclipse/private/mainnet'
+            'Vault/prod/eclipse/mainnet'
         ) AS DATA
 )
 SELECT

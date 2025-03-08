@@ -23,5 +23,5 @@ SELECT
             'params',
             []
         ),
-        'Vault/prod/eclipse/private/mainnet'
+        'Vault/prod/eclipse/mainnet'
     ) :data :result :: INT - 50 AS block_id
