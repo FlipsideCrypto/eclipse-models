@@ -1,4 +1,5 @@
 -- depends_on: {{ ref('bronze__transactions') }}
+-- depends_on: {{ ref('bronze__transactions_2') }}
 
 {{ config(
     materialized = 'incremental',
@@ -21,7 +22,8 @@
     {% endif %}
 {% endif %}
 
-{% set cutover_block_id = 307103862 %}
+{% set cutover_block_id = 53552350 %}
+{% set cutover_partition_key = 53550000 %}
 
 WITH pre_final AS (
     SELECT
@@ -71,6 +73,7 @@ WITH pre_final AS (
         {% else %}
         AND t._inserted_timestamp::date = '2024-09-12'
         {% endif %}
+        AND t.partition_key < {{ cutover_partition_key }}
     UNION ALL
     SELECT
         to_timestamp_ntz(t.value:"result.blockTime"::int) AS block_timestamp,
@@ -99,7 +102,11 @@ WITH pre_final AS (
         t.partition_key,
         t._inserted_timestamp
     FROM
-        {{ ref('bronze__transactions_2') }} AS t
+        {% if is_incremental() %}
+        {{ ref('bronze__transactions_2') }} t
+        {% else %}
+        {{ ref('bronze__FR_transactions_2') }} t
+        {% endif %}
     WHERE
         t.block_id >= {{ cutover_block_id }}
         AND tx_id IS NOT NULL
@@ -113,9 +120,9 @@ WITH pre_final AS (
         {% if is_incremental() %}
         AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
         {% else %}
-        AND t._inserted_timestamp::date = '2024-09-12'
-        AND t._partition_id < 0 /* KEEP THIS FROM SOLANA repo?? keep this here, if we ever do a full refresh this should select no data from streamline 2.0 data */
+        AND t.partition_key < 0 /* keep this here, if we ever do a full refresh this should select no data from _2  */
         {% endif %}
+        AND t.partition_key >= {{ cutover_partition_key}}
 ),
 {% if is_incremental() %}
 prev_null_block_timestamp_txs AS (
