@@ -34,14 +34,14 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 54084999 
+        block_id >= 54084999
     EXCEPT
     SELECT
         block_id
     FROM
         {{ ref('streamline__block_txs_complete') }}
     WHERE
-        block_id <= 54084999 
+        block_id <= 54084999
     EXCEPT
     SELECT 
         block_id
@@ -83,7 +83,7 @@ SELECT
                 )
             )
         ),
-        'Vault/prod/eclipse/mainnet'
+        'Vault/prod/eclipse/private/mainnet'
     ) AS request
 FROM
     blocks
