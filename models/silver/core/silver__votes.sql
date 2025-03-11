@@ -22,8 +22,8 @@
     {% endif %}
 {% endif %}
 
-{% set cutover_block_id = 53552350 %}
-{% set cutover_partition_key = 53550000 %}
+{% set cutover_block_id = 54084999 %}
+{% set cutover_partition_key = 54080000 %}
 
 WITH pre_final AS (
     SELECT
@@ -68,7 +68,7 @@ WITH pre_final AS (
         AND t._inserted_timestamp::date = '2024-09-12'
         {% endif %}
         AND t.partition_key < {{ cutover_partition_key }}
-UNION ALL
+    UNION ALL
     SELECT
         to_timestamp_ntz(t.value:"result.blockTime"::int) AS block_timestamp,
         t.block_id,
@@ -95,9 +95,6 @@ UNION ALL
         {% else %}
         {{ ref('bronze__FR_transactions_2') }} t
         {% endif %}
-    LEFT OUTER JOIN 
-        {{ ref('silver__blocks') }} b
-        ON b.block_id = t.block_id
     JOIN
         table(flatten(t.data:transaction:message:instructions)) i
     WHERE

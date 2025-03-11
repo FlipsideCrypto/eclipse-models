@@ -34,14 +34,14 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 52500858 
+        block_id >= 54084999 
     EXCEPT
     SELECT
         block_id
     FROM
         {{ ref('streamline__block_txs_complete') }}
     WHERE
-        block_id <= 52500858 
+        block_id <= 54084999 
     EXCEPT
     SELECT 
         block_id
@@ -56,7 +56,7 @@ SELECT
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
         'POST',
-        '{Service}',
+        '{Service}/token/{Authentication}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json'

@@ -22,8 +22,8 @@
     {% endif %}
 {% endif %}
 
-{% set cutover_block_id = 53552350 %}
-{% set cutover_partition_key = 53550000 %}
+{% set cutover_block_id = 54084999 %}
+{% set cutover_partition_key = 54080000 %}
 
 WITH pre_final AS (
     SELECT
