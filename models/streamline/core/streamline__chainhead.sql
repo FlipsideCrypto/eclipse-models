@@ -6,7 +6,7 @@
 SELECT
     {{ target.database }}.live.udf_api(
         'POST',
-        '{Service}',
+        '{Service}/token/{Authentication}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json',
@@ -23,5 +23,5 @@ SELECT
             'params',
             []
         ),
-        'Vault/prod/eclipse/mainnet'
+        'Vault/prod/eclipse/private/mainnet'
     ) :data :result :: INT - 50 AS block_id

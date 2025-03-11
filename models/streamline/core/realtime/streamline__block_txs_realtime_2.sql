@@ -56,7 +56,7 @@ SELECT
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
         'POST',
-        '{Service}',
+        '{Service}/token/{Authentication}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json'
@@ -83,7 +83,7 @@ SELECT
                 )
             )
         ),
-        'Vault/prod/eclipse/mainnet'
+        'Vault/prod/eclipse/private/mainnet'
     ) AS request
 FROM
     blocks
