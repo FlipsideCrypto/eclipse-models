@@ -1,5 +1,6 @@
 workflow_name,workflow_schedule
 dbt_run_streamline_blocks_realtime,"2-59/5 * * * *"
+dbt_run_streamline_block_txs_realtime,"14-59/15 * * * *"
 dbt_run_streamline_block_txs_realtime_2,"09-54/15 * * * *"
 dbt_run_incremental_core,"19,49 * * * *"
 dbt_run_incremental_non_core,"4 */3 * * *"
