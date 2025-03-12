@@ -34,14 +34,14 @@ WITH blocks AS (
     FROM
         {{ ref("streamline__blocks") }}
     WHERE
-        block_id >= 52500858
+        block_id >= 52500858 
     EXCEPT
     SELECT
         block_id
     FROM
         {{ ref('streamline__block_txs_complete') }}
     WHERE
-        block_id <= 52500858
+        block_id <= 52500858 
     EXCEPT
     SELECT 
         block_id
