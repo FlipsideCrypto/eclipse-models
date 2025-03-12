@@ -49,7 +49,7 @@ SELECT
     ) :: INT AS partition_key,
     {{ target.database }}.live.udf_api(
         'POST',
-        '{Service}/token/{Authentication}',
+        '{Service}',
         OBJECT_CONSTRUCT(
             'Content-Type',
             'application/json'
