@@ -111,11 +111,8 @@ WITH pre_final AS (
         t.block_id >= {{ cutover_block_id }}
         AND tx_id IS NOT NULL
         AND (
-            COALESCE(t.data :transaction :message :instructions [0] :programId :: STRING,'') <> 'Vote111111111111111111111111111111111111111'
-            OR
-            (
-                array_size(t.data :transaction :message :instructions) > 1
-            )
+            coalesce(t.data:transaction:message:instructions[0]:programId::STRING,'') <> 'Vote111111111111111111111111111111111111111'
+            OR array_size(t.data:transaction:message:instructions) > 1
         )
         {% if is_incremental() %}
         AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
