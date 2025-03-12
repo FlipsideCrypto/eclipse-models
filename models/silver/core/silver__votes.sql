@@ -1,4 +1,5 @@
 -- depends_on: {{ ref('bronze__transactions') }}
+-- depends_on: {{ ref('bronze__transactions_2') }}
 
 {{ config(
     materialized = 'incremental',
@@ -20,6 +21,9 @@
     {% set max_inserted_timestamp = run_query(max_inserted_query)[0][0] %}
     {% endif %}
 {% endif %}
+
+{% set cutover_block_id = 54084999 %}
+{% set cutover_partition_key = 54080000 %}
 
 WITH pre_final AS (
     SELECT
@@ -54,7 +58,8 @@ WITH pre_final AS (
     JOIN
         table(flatten(t.data:transaction:message:instructions)) i
     WHERE
-        tx_id IS NOT NULL
+        t.block_id < {{cutover_block_id}}
+        AND tx_id IS NOT NULL
         AND coalesce(t.data:transaction:message:instructions[0]:programId::string,'') = 'Vote111111111111111111111111111111111111111'
         AND i.value:programId::string = 'Vote111111111111111111111111111111111111111'
         {% if is_incremental() %}
@@ -62,6 +67,47 @@ WITH pre_final AS (
         {% else %}
         AND t._inserted_timestamp::date = '2024-09-12'
         {% endif %}
+        AND t.partition_key < {{ cutover_partition_key }}
+    UNION ALL
+    SELECT
+        to_timestamp_ntz(t.value:"result.blockTime"::int) AS block_timestamp,
+        t.block_id,
+        t.data:transaction:signatures[0]::string AS tx_id,
+        t.value:array_index as index,
+        t.data:transaction:message:recentBlockhash::string AS recent_block_hash,
+        t.data:meta:fee::number AS fee,
+        CASE
+            WHEN is_null_value(t.data:meta:err) THEN 
+                TRUE
+            ELSE 
+                FALSE
+        END AS succeeded,
+        t.data:transaction:message:accountKeys::array AS account_keys,
+        i.index::int AS vote_index,
+        i.value:parsed:type::string AS event_type,
+        i.value::variant AS instruction,
+        t.data:version::string as version,
+        t.partition_key,
+        t._inserted_timestamp
+    FROM
+        {% if is_incremental() %}
+        {{ ref('bronze__transactions_2') }} t
+        {% else %}
+        {{ ref('bronze__FR_transactions_2') }} t
+        {% endif %}
+    JOIN
+        table(flatten(t.data:transaction:message:instructions)) i
+    WHERE
+        t.block_id >= {{ cutover_block_id }}
+        AND tx_id IS NOT NULL
+        AND coalesce(t.data:transaction:message:instructions[0]:programId::string,'') = 'Vote111111111111111111111111111111111111111'
+        AND i.value:programId::string = 'Vote111111111111111111111111111111111111111'
+        {% if is_incremental() %}
+        AND t._inserted_timestamp >= '{{ max_inserted_timestamp }}'
+        {% else %}
+        AND t.partition_key < 0 /* keep this here, if we ever do a full refresh this should select no data from _2  */
+        {% endif %}
+        AND t.partition_key >= {{ cutover_partition_key}}
 ),
 {% if is_incremental() %}
 prev_null_block_timestamp_txs AS (
