@@ -1,6 +1,6 @@
 -- depends_on: {{ ref('bronze__transactions_2') }}
 -- depends_on: {{ ref('bronze__FR_transactions_2') }}
-
+-- depends_on: {{ ref('streamline__blocks') }}
 
 {{ config (
     materialized = "incremental",
@@ -8,6 +8,27 @@
     merge_exclude_columns = ["inserted_timestamp"],
     cluster_by = "ROUND(block_id, -4)",
 ) }}
+
+{% if execute %}
+    {% set min_partition_key_query %}
+        SELECT round(min(block_id),-4)::int AS min_partition_key
+        FROM (
+            SELECT
+                block_id
+            FROM
+                {{ ref("streamline__blocks") }}
+            WHERE
+                /* Find the earliest block available from the node provider */
+                block_id >= 6572203
+            EXCEPT
+            SELECT
+                block_id
+            FROM
+                {{ this }}
+        )
+    {% endset %}
+    {% set min_partition_key = run_query(min_partition_key_query)[0][0] %}
+{% endif %}
 
 SELECT
     block_id,
@@ -20,18 +41,10 @@ FROM
 {% if is_incremental() %}
     {{ ref('bronze__transactions_2') }}
 WHERE
-    _inserted_timestamp >= (
+    partition_key >= {{ min_partition_key }}
+    AND _inserted_timestamp >= (
         SELECT
-            COALESCE(MAX(_INSERTED_TIMESTAMP), '1970-01-01' :: DATE) max_INSERTED_TIMESTAMP
-        FROM
-            {{ this }}
-    )
-    AND partition_key >= (
-        SELECT
-            COALESCE(
-                MAX(partition_key),
-                0
-            )
+            coalesce(max(_inserted_timestamp), '1970-01-01' :: DATE) AS max_inserted_timestamp
         FROM
             {{ this }}
     )
