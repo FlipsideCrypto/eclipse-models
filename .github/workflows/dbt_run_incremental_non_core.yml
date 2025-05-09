@@ -41,4 +41,10 @@ jobs:
       - name: Run DBT Jobs
         run: |
           dbt run -s "eclipse_models,tag:scheduled_core" "eclipse_models,tag:scheduled_non_core" 
-          
+
+  notify-failure:
+    needs: [run_dbt_jobs]
+    if: failure()
+    uses: ./.github/workflows/slack_notify.yml
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}    

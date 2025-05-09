@@ -42,3 +42,10 @@ jobs:
       - name: Run DBT Jobs
         run: |
           dbt run -s streamline__block_txs_complete_2 streamline__block_txs_realtime_2 --vars '{STREAMLINE_INVOKE_STREAMS: True}'
+
+  notify-failure:
+    needs: [run_dbt_jobs]
+    if: failure()
+    uses: ./.github/workflows/slack_notify.yml
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
