@@ -43,3 +43,10 @@ jobs:
       - name: Run DBT Jobs
         run: |
           dbt build --vars '{"OBSERV_FULL_TEST":True}' -s "eclipse_models,tag:observability"
+
+  notify-failure:
+    needs: [run_dbt_jobs]
+    if: failure()
+    uses: ./.github/workflows/slack_notify.yml
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
