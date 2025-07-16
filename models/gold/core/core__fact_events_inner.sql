@@ -32,7 +32,6 @@ SELECT
     program_id,
     event_type,
     instruction,
-    _inserted_timestamp,
     events_inner_id AS fact_events_inner_id,
     sysdate() AS inserted_timestamp,
     sysdate() AS modified_timestamp
