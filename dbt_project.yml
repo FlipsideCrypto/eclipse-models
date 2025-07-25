@@ -44,6 +44,15 @@ models:
         materialized: ephemeral
   eclipse_models:
     +pre-hook: '{{ fsc_utils.set_query_tag() }}'
+    gold:
+      +post-hook: >
+        {% if 'exclude_change_tracking' not in config.get('tags') %}
+          {% if config.get('materialized') == 'view' %}
+            ALTER VIEW {{ this }} SET CHANGE_TRACKING = TRUE;
+          {% else %}
+            ALTER TABLE {{ this }} SET CHANGE_TRACKING = TRUE;
+          {% endif %}
+        {% endif %}  
 
 tests:
   +store_failures: true # all tests
